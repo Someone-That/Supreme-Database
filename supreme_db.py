@@ -12,9 +12,26 @@ DATABASE_FILE = "Pizza_database.db"
 #with sqlite3.connect(DATABASE_FILE) as connection:
 #    pass
 
-print("test")
-#file_test = open("text.txt", "r")
+text_file = open('H:/13DTP/SupremeDatabase/Units/UAA0101_unit.bp','r')
+unit_blueprint = text_file.readlines()
+current_section = ""
+roles = {
+    "Air": False,
+    "Naval": False,
+    "Land": False,
+    "Anti Air": False,
+    "Anti Naval": False
+}
 
-#print(file_test.read())
-print("test")
+
+for line in unit_blueprint:
+    if "Categories" in line:
+        current_section = "categories"
+    
+    if "= {" in line and "    " in line and "     " not in line: #detects for starting of a second level dictionary
+        current_section = line
+    if current_section == "categories":
+        if '"AIR"' in line:
+            pass
+            #print(line)
 
