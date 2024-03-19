@@ -8,7 +8,7 @@ faction_conversion = {
     "R": "Cybran",
     "S": "Seraphim"
 }
-units_path = "S:/units"
+units_path = "S:/units/"
 
 
 #cursor = connection.cursor()
@@ -95,7 +95,11 @@ def iterate_through_file():
 
 
 def add_unit_to_supreme_database():
-    pass
+    with sqlite3.connect(DATABASE_FILE) as connection:
+        cursor = connection.cursor()
+        sql = f"SELECT * FROM {table}"
+        cursor.execute(sql) #executes the SELECT statement on the chosen table
+
 
 
 def process_file(filename):
@@ -108,12 +112,15 @@ def process_file(filename):
         return
     if filename[2] == "C" or filename[2] == "B":
         return
-    print(filename)
-    return
+    #print(filename)
+    #return
 
     #initialise variables
-    text_file = open('H:/13DTP/SupremeDatabase/Units/UAA0101_unit.bp','r')
-    unit_blueprint = text_file.readlines()
+    try:
+        text_file = open(f"{units_path}{filename}/{filename}_unit.bp",'r')
+        unit_blueprint = text_file.readlines()
+    except:
+        pass
     current_section = ""
     unit_name = ""
     unit_health = 0
@@ -130,7 +137,14 @@ def process_file(filename):
         "Anti Naval": False
     }
 
+    #find tech 3 mobile anti aa seraphim
+
+    
+
     iterate_through_file()
+    if unit_tech_level == 3 and roles["Anti Air"] and roles["Land"] and unit_faction == "Seraphim":
+        print(unit_name)
+    return
 
     add_unit_to_supreme_database()
 
