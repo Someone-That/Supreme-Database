@@ -2,6 +2,13 @@ import sqlite3
 import os
 
 DATABASE_FILE = "Pizza_database.db"
+faction_conversion = {
+    "A": "Aeon",
+    "E": "UEF",
+    "R": "Cybran",
+    "S": "Seraphim"
+}
+units_path = "S:/units"
 
 
 #cursor = connection.cursor()
@@ -13,21 +20,7 @@ DATABASE_FILE = "Pizza_database.db"
 #with sqlite3.connect(DATABASE_FILE) as connection:
 #    pass
 
-text_file = open('H:/13DTP/SupremeDatabase/Units/UAA0101_unit.bp','r')
-unit_blueprint = text_file.readlines()
-current_section = ""
-unit_name = ""
-unit_health = 0
-unit_mass_cost = 0
-unit_energy_cost = 0
-unit_build_time = 0
-roles = {
-    "Air": False,
-    "Naval": False,
-    "Land": False,
-    "Anti Air": False,
-    "Anti Naval": False
-}
+
 
 
 def get_name_from_line(line):
@@ -64,6 +57,7 @@ def get_number_from_line(line):
 
 
 def iterate_through_file():
+    ''' loops through unit blueprint and extracts and sets all required variables out'''
     line_number = 0
     for line in unit_blueprint:
         if line_number == 1:
@@ -98,10 +92,51 @@ def iterate_through_file():
                 unit_mass_cost = get_number_from_line(line)
             if ' BuildTime =' in line:
                 unit_build_time = get_number_from_line(line)
+
+
+def add_unit_to_supreme_database():
+    pass
+
+
+def process_file(filename):
+    #UAA0101 [0] is unit  [1] is faction   [2] is unit type  [4] is tech level
+
+    #filters out non units and civilians and buildings
+    if len(filename) != 7:
+        return
+    if filename[0] != "U" and filename[0] != "X":
+        return
+    if filename[2] == "C" or filename[2] == "B":
+        return
+    print(filename)
+    return
+
+    #initialise variables
+    text_file = open('H:/13DTP/SupremeDatabase/Units/UAA0101_unit.bp','r')
+    unit_blueprint = text_file.readlines()
+    current_section = ""
+    unit_name = ""
+    unit_health = 0
+    unit_tech_level = int(filename[4])
+    unit_faction = faction_conversion[filename[1]]
+    unit_mass_cost = 0
+    unit_energy_cost = 0
+    unit_build_time = 0
+    roles = {
+        "Air": False,
+        "Naval": False,
+        "Land": False,
+        "Anti Air": False,
+        "Anti Naval": False
+    }
+
+    iterate_through_file()
+
+    add_unit_to_supreme_database()
+
             
 
 
 
-for filename in os.listdir("H:/13DTP/SupremeDatabase/Units"):
-    #UAA0101 [0] is unit  [1] is faction   [2] is unit type  [4] is tech level
-    iterate_through_file()
+for filename in os.listdir(units_path):
+    process_file(filename)
