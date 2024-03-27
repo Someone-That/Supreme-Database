@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DATABASE_FILE = "Pizza_database.db"
+DATABASE_FILE = "supreme_db.db"
 faction_conversion = {
     "A": "Aeon",
     "E": "UEF",
@@ -9,18 +9,6 @@ faction_conversion = {
     "S": "Seraphim"
 }
 units_path = "S:/units/"
-
-
-#cursor = connection.cursor()
-#sql = f"SELECT * FROM {table}"
-#cursor.execute(sql) #executes the SELECT statement on the chosen table
-#results = cursor.fetchall() #stores the results in the results variable
-
-
-#with sqlite3.connect(DATABASE_FILE) as connection:
-#    pass
-
-
 
 
 def get_name_from_line(line):
@@ -62,10 +50,10 @@ def iterate_through_file():
     for line in unit.blueprint:
         if line_number == 1:
             unit.name = get_name_from_line(line)
-        
+
         if "= {" in line and "    " in line and "     " not in line:  # detects for beginnings of a second level dictionary
             unit.current_section = get_category_from_line(line)
-        
+
         if unit.current_section == "Categories":
             if '"AIR"' in line:
                 unit.roles["Air"] = True
@@ -80,11 +68,11 @@ def iterate_through_file():
                 unit.roles["Anti Air"] = True
             if '"ANTINAVY"' in line:
                 unit.roles["Anti Naval"] = True
-            
+
         if unit.current_section == "Defense":
             if ' Health = ' in line:
                 unit.health = get_number_from_line(line)
-        
+
         if unit.current_section == "Economy":
             if ' BuildCostEnergy =' in line:
                 unit.energy_cost = get_number_from_line(line)
@@ -98,8 +86,28 @@ def iterate_through_file():
 def add_unit_to_supreme_database():
     with sqlite3.connect(DATABASE_FILE) as connection:
         cursor = connection.cursor()
-        sql = f"SELECT * FROM {table}"
-        cursor.execute(sql) #executes the SELECT statement on the chosen table
+
+        #  get faction id
+        sql = f"SELECT id FROM Factions WHERE name = '{unit.faction}'"
+        cursor.execute(sql)
+        faction_id = cursor.fetchall()[0][0]
+
+        #  insert unit data
+        sql = f"INSERT INTO Units VALUES ({unit.identification}, '{unit.name}', {unit.health}, {unit.mass_cost}, {unit.energy_cost}, {unit.build_time}, {unit.tech_level}, {faction_id});"
+        
+        cursor.execute(sql)
+
+        #  insert unit roles
+        for role in unit.roles:
+            if unit.roles[role]:  # unit is in a role
+                #  get role id
+                sql = f"SELECT id FROM Roles WHERE name = '{role}'"
+                cursor.execute(sql)
+                role_id = cursor.fetchall()[0][0]
+
+                #  insert unit into role
+                sql = f"INSERT INTO Unit_Roles VALUES ({unit.identification}, {role_id});"
+                cursor.execute(sql)
 
 
 def process_file(filename):
@@ -120,8 +128,9 @@ def process_file(filename):
     try:
         text_file = open(f"{units_path}{filename}/{filename}_unit.bp", 'r')
         unit.blueprint = text_file.readlines()
-    except:  # unacceptable file pattern detected
+    except FileNotFoundError:  # unacceptable file pattern detected
         return
+    unit.identification += 1
     unit.current_section = ""
     unit.name = ""
     unit.health = 0
@@ -138,19 +147,13 @@ def process_file(filename):
         "Anti Naval": False
     }
 
-
     iterate_through_file()
-    if unit.roles["Anti Air"] and unit.roles["Land"]:
-        print(unit.name, unit.health, unit.faction, unit.mass_cost, unit.energy_cost, unit.build_time)
-    return
 
     add_unit_to_supreme_database()
 
-            
 
-
-#initialise variables
-class unit:
+class unit:  # initialise variables
+    identification = 0
     blueprint = ""
     current_section = ""
     name = ""
@@ -167,5 +170,7 @@ class unit:
         "Anti Air": False,
         "Anti Naval": False
     }
+
+
 for filename in os.listdir(units_path):
     process_file(filename)
