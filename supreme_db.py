@@ -64,6 +64,7 @@ def iterate_through_file():
             unit_name = get_name_from_line(line)
         
         if "= {" in line and "    " in line and "     " not in line: #detects for beginnings of a second level dictionary
+            print("test")
             current_section = get_category_from_line(line)
         
         if current_section == "Categories":
@@ -92,6 +93,7 @@ def iterate_through_file():
                 unit_mass_cost = get_number_from_line(line)
             if ' BuildTime =' in line:
                 unit_build_time = get_number_from_line(line)
+        line_number += 1
 
 
 def add_unit_to_supreme_database():
@@ -112,15 +114,16 @@ def process_file(filename):
         return
     if filename[2] == "C" or filename[2] == "B":
         return
-    #print(filename)
-    #return
+    if filename[1] == "X":
+        return
 
     #initialise variables
+    unit_blueprint = ""
     try:
         text_file = open(f"{units_path}{filename}/{filename}_unit.bp",'r')
         unit_blueprint = text_file.readlines()
-    except:
-        pass
+    except: # unacceptable file pattern detected
+        return
     current_section = ""
     unit_name = ""
     unit_health = 0
@@ -144,6 +147,7 @@ def process_file(filename):
     iterate_through_file()
     if unit_tech_level == 3 and roles["Anti Air"] and roles["Land"] and unit_faction == "Seraphim":
         print(unit_name)
+        print("test")
     return
 
     add_unit_to_supreme_database()
@@ -151,6 +155,24 @@ def process_file(filename):
             
 
 
-
+#initialise variables
+unit_blueprint = ""
+current_section = ""
+unit_name = ""
+unit_health = 0
+unit_tech_level = 0
+unit_faction = "nothing"
+unit_mass_cost = 0
+unit_energy_cost = 0
+unit_build_time = 0
+roles = {
+    "Air": False,
+    "Naval": False,
+    "Land": False,
+    "Anti Air": False,
+    "Anti Naval": False
+}
 for filename in os.listdir(units_path):
     process_file(filename)
+
+
