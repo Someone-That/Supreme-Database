@@ -94,7 +94,7 @@ def add_unit_to_supreme_database():
 
         #  insert unit data
         sql = f"INSERT INTO Units VALUES ({unit.identification}, '{unit.name}', {unit.health}, {unit.mass_cost}, {unit.energy_cost}, {unit.build_time}, {unit.tech_level}, {faction_id});"
-        
+
         cursor.execute(sql)
 
         #  insert unit roles
@@ -148,6 +148,8 @@ def process_file(filename):
     }
 
     iterate_through_file()
+    if unit.name == "None":
+        print("unit")
 
     add_unit_to_supreme_database()
 
@@ -172,5 +174,25 @@ class unit:  # initialise variables
     }
 
 
+with sqlite3.connect(DATABASE_FILE) as connection:
+    '''clears the database for data entry'''
+    cursor = connection.cursor()
+
+    #  wipe database
+    sql = "DELETE FROM Units;"
+    cursor.execute(sql)
+    sql = "DELETE FROM Unit_Roles;"
+    cursor.execute(sql)
+
+
 for filename in os.listdir(units_path):
     process_file(filename)
+
+
+with sqlite3.connect(DATABASE_FILE) as connection:
+    '''filters out remaining unwanted units'''
+    cursor = connection.cursor()
+
+    #  deletes unwanted units
+    sql = "DELETE FROM Units WHERE name = 'None';"
+    cursor.execute(sql)
