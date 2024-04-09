@@ -45,18 +45,24 @@ def ask_user_for_number(lowest_choice, highest_choice):
             print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
 
 
-def show_units(connection):
+def ask_user_for_number_list(lowest_choice, highest_choice):
+    pass
+
+
+def user_show_units(connection):
     '''will take the user through the process of showing units'''
 
-    print("What tech level would you like to filter for?")
+    # go through filtering process
+    print("\nType the numbers of the tech levels you would like to filter for:")
     print("""
         1. Tech level 1
         2. Tech level 2
         3. Tech level 3
         4. Experimental (Tech level 4)
-        5. All tech levels""")
-    tech_level = ask_user_for_number(1, 5)
-
+        5. All tech levels
+E.G. To select tech levels 1 and 2, type '1, 2' or '1 2'""")
+    tech_levels_to_filter_for = []
+    
     print("What faction would you like to filter for?")
     print("""
         1. Seraphim
@@ -66,9 +72,21 @@ def show_units(connection):
         5. All factions""")
 
 
+def user_update_unit(connection):
+    pass
+
+
+def user_add_unit(connection):
+    pass
+
+
+def user_delete_unit(connection):
+    pass
+
+
 # code below here handles the console interfacing
 def console_interface(connection):
-    spacing()
+    #spacing()
     print("What would you like to do?")
     print("""
         1. Show units
@@ -79,13 +97,13 @@ def console_interface(connection):
 
     match what_to_do:
         case 1:  # user wants to see units
-            print("1")
+            user_show_units(connection)
         case 2:  # user wants to update a unit
-            print("2")
+            user_update_unit(connection)
         case 3:  # user wants to add a unit
-            pass
+            user_add_unit(connection)
         case 4:  # user wants to delete a unit
-            pass
+            user_delete_unit(connection)
 
 
 with sqlite3.connect(DATABASE_FILE) as connection:
@@ -96,12 +114,3 @@ with sqlite3.connect(DATABASE_FILE) as connection:
     # cursor.execute(sql) #executes the SELECT statement on the chosen table
     # results = cursor.fetchall() #stores the results in the results variable
     # print(results)
-
-count = 0
-for info in results:
-    nothing = ""
-    if count == 0:
-        print(f"{nothing:<30}{info[1]:<40}{info[2]:<100}")
-        count += 1
-    else:
-        print(f"{info[0]:<30}{info[1]:<40}{info[2]:<100}")
