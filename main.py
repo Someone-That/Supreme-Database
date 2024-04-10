@@ -30,67 +30,70 @@ def display_results(connection, sql):
 
 def spacing(spacing: int = 60):
     '''prints 60 new lines'''
-    for nothing in range(spacing):
-        print("\n")
+    print("\n" * spacing)
 
 
 def ask_user_for_number(lowest_choice, highest_choice):
     '''bullet proof function that asks the user for a number and only accepts a number within the parameters'''
     while True:
         try:  # asks the user for an integer and responds appropriately
-            print("")
-            user_answer = int(input("To pick an option, type a number: "))
+            user_answer = int(input("\nTo pick an option, type a number: "))
             if user_answer < lowest_choice or user_answer > highest_choice:
-                print("")
-                #print("That is not an option.")
-                print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
+                #print("\nThat is not an option.")
+                print("\nYour life is NOTHING. You serve ZERO purpose. You should retry NOW.")
             else:
                 return user_answer
         except ValueError:  # the user failed to type in an integer
-            print("")
-            #print("That is not an integer.")
-            print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
+            #print("\nThat is not an integer.")
+            print("\nYour life is NOTHING. You serve ZERO purpose. You should retry NOW.")
 
 
 def ask_user_for_number_list(lowest_choice, highest_choice):
     '''bullet proof function that asks the user for a list of numbers and only accepts valid inputs'''
     while True:
-        try:  # asks the user for an integer and responds appropriately
-            print("")
-            user_answer = int(input("To pick an option, type a number: "))
-            if user_answer < lowest_choice or user_answer > highest_choice:
-                print("")
-                #print("That is not an option.")
-                print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
-            else:
-                return user_answer
-        except ValueError:  # the user failed to type in an integer
-            print("")
-            #print("That is not an integer.")
-            print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
+        return_list = []
+        user_answer = input("\nNumbers: ")
+        broke = False
+        for i in user_answer:
+            if i.isdigit():
+                i = int(i)
+                if i < lowest_choice or i > highest_choice:
+                    print("\nOut of range number/s and worthless life detected. You serve ZERO purpose. You should retry NOW.")
+                    broke = True
+                    break
+                else:
+                    return_list.append(i)
+        if broke: continue
+        if return_list: return return_list
+
+        # user inputted no numbers
+        print("\nNo numbers detected, input numbers. Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
 
 
 def user_show_units(connection):
     '''will take the user through the process of showing units'''
 
     # go through filtering process
-    print("\nType the numbers of the tech levels you would like to filter for:")
+    print("\nType the numbers of the tech levels you would like to filter for: ")
     print("""
         1. Tech level 1
         2. Tech level 2
         3. Tech level 3
         4. Experimental (Tech level 4)
         5. All tech levels
+
 E.G. To select tech levels 1 and 2, type '1, 2' or '1 2'""")
-    tech_levels_to_filter_for = []
+    tech_levels_to_filter_for = ask_user_for_number_list(1, 5)
+    print("tech levels to filter for: ", tech_levels_to_filter_for)
     
-    print("What faction would you like to filter for?")
+    print("\nWhat faction would you like to filter for?")
     print("""
         1. Seraphim
         2. UEF
         3. Cybran
         4. Aeon
         5. All factions""")
+    faction_to_filter_for = ask_user_for_number_list(1, 5)
 
 
 def user_update_unit(connection):
@@ -106,12 +109,12 @@ def user_add_unit(connection):
 def user_delete_unit(connection):
     #show units
     #unit_to_delete = ask_user_for_number(1, max)
-    sql_statement(connection)
+    sql_statement(connection, "sql")
 
 
 # code below here handles the console interfacing
 def console_interface(connection):
-    #spacing()
+    spacing()
     print("What would you like to do?")
     print("""
         1. Show units
