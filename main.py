@@ -7,6 +7,13 @@ DATABASE_FILE = "supreme_db.db"
 '''Functions'''
 
 
+def sql_statement(connection, sql):
+    '''executes sql statement'''
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+
 def display_results(connection, sql):
     '''nicely print out a table'''
     try:
@@ -46,7 +53,21 @@ def ask_user_for_number(lowest_choice, highest_choice):
 
 
 def ask_user_for_number_list(lowest_choice, highest_choice):
-    pass
+    '''bullet proof function that asks the user for a list of numbers and only accepts valid inputs'''
+    while True:
+        try:  # asks the user for an integer and responds appropriately
+            print("")
+            user_answer = int(input("To pick an option, type a number: "))
+            if user_answer < lowest_choice or user_answer > highest_choice:
+                print("")
+                #print("That is not an option.")
+                print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
+            else:
+                return user_answer
+        except ValueError:  # the user failed to type in an integer
+            print("")
+            #print("That is not an integer.")
+            print("Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
 
 
 def user_show_units(connection):
@@ -73,6 +94,8 @@ E.G. To select tech levels 1 and 2, type '1, 2' or '1 2'""")
 
 
 def user_update_unit(connection):
+    #show units
+    #unit_id_to_update = ask_user_for_number(1,max)
     pass
 
 
@@ -81,7 +104,9 @@ def user_add_unit(connection):
 
 
 def user_delete_unit(connection):
-    pass
+    #show units
+    #unit_to_delete = ask_user_for_number(1, max)
+    sql_statement(connection)
 
 
 # code below here handles the console interfacing
