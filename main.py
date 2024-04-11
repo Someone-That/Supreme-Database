@@ -51,7 +51,7 @@ def ask_user_for_number(lowest_choice, highest_choice):
 def ask_user_for_number_list(lowest_choice, highest_choice):
     '''bullet proof function that asks the user for a list of numbers and only accepts valid inputs'''
     while True:
-        return_list = []
+        return_list = set()
         user_answer = input("\nNumbers: ")
         broke = False
         for i in user_answer:
@@ -62,9 +62,18 @@ def ask_user_for_number_list(lowest_choice, highest_choice):
                     broke = True
                     break
                 else:
-                    return_list.append(i)
-        if broke: continue
-        if return_list: return return_list
+                    return_list.add(i)
+        if broke:
+            continue
+        if return_list:
+            return_list = sorted(list(return_list))
+
+            if highest_choice in return_list:  # user selected the 'all' option
+                return_list = []
+                for i in range(highest_choice-1):
+                    return_list.append(i+1)
+
+            return return_list
 
         # user inputted no numbers
         print("\nNo numbers detected, input numbers. Your life is NOTHING. You serve ZERO purpose. You should retry NOW.")
@@ -84,16 +93,30 @@ def user_show_units(connection):
 
 E.G. To select tech levels 1 and 2, type '1, 2' or '1 2'""")
     tech_levels_to_filter_for = ask_user_for_number_list(1, 5)
-    print("tech levels to filter for: ", tech_levels_to_filter_for)
-    
-    print("\nWhat faction would you like to filter for?")
+    print(tech_levels_to_filter_for)
+
+    print("\nType the numbers of the factions you would like to filter for: ")
     print("""
         1. Seraphim
         2. UEF
         3. Cybran
         4. Aeon
-        5. All factions""")
-    faction_to_filter_for = ask_user_for_number_list(1, 5)
+        5. All factions
+
+E.G. To select factions Seraphim and UEF, type '1, 2' or '1 2'""")
+    factions_to_filter_for = ask_user_for_number_list(1, 5)
+
+    print("\nType the numbers of the roles you would like to filter for: ")
+    print("""
+        1. Land
+        2. Air
+        3. Navy
+        4. Anti-Air
+        5. Anti-Navy
+        6. All roles
+
+E.G. To select roles Land and Air, type '1, 2' or '1 2'""")
+    roles_to_filter_for = ask_user_for_number_list(1, 6)
 
 
 def user_update_unit(connection):
