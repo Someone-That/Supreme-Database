@@ -88,7 +88,7 @@ def add_unit_to_supreme_database():
         cursor = connection.cursor()
 
         #  get faction id
-        sql = f"SELECT id FROM Factions WHERE name = '{unit.faction}'"
+        sql = f"SELECT faction_id FROM Factions WHERE faction_name = '{unit.faction}'"
         cursor.execute(sql)
         faction_id = cursor.fetchall()[0][0]
 
@@ -101,7 +101,7 @@ def add_unit_to_supreme_database():
         for role in unit.roles:
             if unit.roles[role]:  # unit is in a role
                 #  get role id
-                sql = f"SELECT id FROM Roles WHERE name = '{role}'"
+                sql = f"SELECT role_id FROM Roles WHERE role_name = '{role}'"
                 cursor.execute(sql)
                 role_id = cursor.fetchall()[0][0]
 
