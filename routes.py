@@ -35,8 +35,15 @@ def home():
 @app.route('/<int:id>')
 def unit(id):
     connection = sqlite3.connect('supreme_db.db')
-    unit_info = sql_statement(connection, f"SELECT * FROM Units WHERE id = {id}")
-    # unit_info[0] = id, [1] = name, [2-5] = health, mass cost, energy cost, build time
+    unit_info = sql_statement(connection, f"""
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name FROM 
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+WHERE id = {id}
+GROUP BY id
+ORDER BY faction_name, tech_level""")
+    # unit_info[0] = id, [1] = name, [2-7] = health, mass cost, energy cost, build time, tech level, faction
     return render_template("unit.html", unit_id=id, unit=unit_info[0])
 
 
