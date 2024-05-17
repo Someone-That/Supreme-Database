@@ -36,7 +36,7 @@ def home():
 def unit(id):
     connection = sqlite3.connect('supreme_db.db')
     unit_info = sql_statement(connection, f"""
-SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name FROM 
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
