@@ -28,7 +28,17 @@ def clean_up_data(data):
 @app.route('/')
 def home():
     connection = sqlite3.connect('supreme_db.db')
-    all_units = sql_statement(connection, "SELECT id, name FROM Units")
+    extraction = sql_statement(connection, "SELECT id, unit_name, tech_level, name, code FROM Units")
+    all_units = []
+    for unit in extraction:  # put units in digestable form for website output
+        if unit[2] == 4:  # unit is experimental
+            result = f"{unit[3]} [{unit[4]}]"
+        else:
+            result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
+        if unit[1]:  # unit has a name
+            result = f"{unit[1]}: {result}"
+        
+        all_units.append((unit[0],result))
     return render_template("home.html", units=all_units)
 
 

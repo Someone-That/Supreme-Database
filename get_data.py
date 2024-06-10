@@ -68,6 +68,14 @@ def iterate_through_file():
                 unit.roles["Anti Air"] = True
             if '"ANTINAVY"' in line:
                 unit.roles["Anti Naval"] = True
+            if '"TECH1"' in line:
+                unit.tech_level = 1
+            if '"TECH2"' in line:
+                unit.tech_level = 2
+            if '"TECH3"' in line:
+                unit.tech_level = 3
+            if '"EXPERIMENTAL"' in line:
+                unit.tech_level = 4
 
         if unit.current_section == "Defense":
             if ' Health = ' in line:
@@ -80,6 +88,10 @@ def iterate_through_file():
                 unit.mass_cost = get_number_from_line(line)
             if ' BuildTime =' in line:
                 unit.build_time = get_number_from_line(line)
+     
+        if unit.current_section == "General":
+            if 'UnitName =' in line:
+                unit.unit_name = get_name_from_line(line)
         line_number += 1
 
 
@@ -93,7 +105,7 @@ def add_unit_to_supreme_database():
         faction_id = cursor.fetchall()[0][0]
 
         #  insert unit data
-        sql = f"INSERT INTO Units VALUES ({unit.identification}, '{unit.name}', {unit.health}, {unit.mass_cost}, {unit.energy_cost}, {unit.build_time}, {unit.tech_level}, {faction_id});"
+        sql = f"INSERT INTO Units VALUES ({unit.identification}, '{unit.name}', {unit.health}, {unit.mass_cost}, {unit.energy_cost}, {unit.build_time}, {unit.tech_level}, {faction_id}, '{unit.code}', '{unit.unit_name}');"
 
         cursor.execute(sql)
 
@@ -116,7 +128,7 @@ def process_file(filename):
     # filters out non units and civilians and buildings
     if len(filename) != 7:
         return
-    if filename[0] != "U" and filename[0] != "X":
+    if filename[0] != "U" and filename[0] != "X" and filename[0] != "D":
         return
     if filename[2] == "C" or filename[2] == "B":
         return
@@ -146,10 +158,13 @@ def process_file(filename):
         "Anti Air": False,
         "Anti Naval": False
     }
+    unit.code = filename
+    unit.unit_name = ""
 
     iterate_through_file()
-    if unit.name == "None":
-        print("unit")
+
+    if unit.unit_name == "Dostya":  # this is a campaign unit and is just acu remains
+        return
 
     add_unit_to_supreme_database()
 
@@ -172,6 +187,8 @@ class unit:  # initialise variables
         "Anti Air": False,
         "Anti Naval": False
     }
+    code = ""
+    unit_name = ""
 
 
 with sqlite3.connect(DATABASE_FILE) as connection:

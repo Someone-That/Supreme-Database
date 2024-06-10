@@ -10,7 +10,7 @@ a
 {
     text-decoration: none;
     text-align: left;
-    color: wheat
+    color: aquamarine;
 }
 
 button 
@@ -31,8 +31,8 @@ button
 
 .back 
 {
-    background-color: gray; 
-    color: black; 
+    background-color: green;
+    color: white;
     border: 2px solid #04AA6D;
 }
 
