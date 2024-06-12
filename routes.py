@@ -42,7 +42,7 @@ def home():
     return render_template("home.html", units=all_units)
 
 
-@app.route('/<int:id>')
+@app.route('/unit/<int:id>')
 def unit(id):
     connection = sqlite3.connect('supreme_db.db')
     unit_info = sql_statement(connection, f"""
