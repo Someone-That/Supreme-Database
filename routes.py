@@ -57,6 +57,11 @@ ORDER BY faction_name, tech_level""")
     return render_template("unit.html", unit_id=id, unit=unit_info[0])
 
 
+@app.route('/manage-units')
+def manage_units():
+    return render_template("manage_units.html")
+
+
 @app.errorhandler(404)  # 404 page
 def page_not_found(error):
     return render_template("404.html", title="cease this")
