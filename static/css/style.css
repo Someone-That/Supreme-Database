@@ -9,16 +9,65 @@ body
 a
 {
     text-decoration: none;
-    text-align: left;
-    color: lightblue;
+    /* text-align: left; */
+    color: white;
 }
 
-nav
+header
 {
-    color: lightblue;
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    padding: 0px 5%;
 }
 
-button 
+.mub 
+{
+    margin-left: 35px;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    padding: 9px 25px;
+    background-color: rgba(84, 84, 84,1);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+}
+
+.mub:hover
+{
+    background-color: rgba(84,84,84,0.7);
+}
+
+.faction_links
+{
+    list-style: none;
+    font-size: 1.2rem;
+}
+
+.faction_links li
+{
+    display: inline-block;
+    padding: 0px 10px;
+}
+
+.faction_links li a
+{
+    transition: all 0.3s ease 0s;
+}
+
+.faction_links li a:hover
+{
+    opacity: 0.7;
+}
+
+.logo
+{
+    margin-right: auto;
+}
+
+.back 
 {
     display: block;
     background-color: #04AA6D;
@@ -32,10 +81,7 @@ button
     margin: 4px 2px;
     transition-duration: 0.4s;
     cursor: pointer;
-}
 
-.back 
-{
     background-color: green;
     color: white;
     border: 2px solid #04AA6D;
