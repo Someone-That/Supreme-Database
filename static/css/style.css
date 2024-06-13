@@ -10,7 +10,12 @@ a
 {
     text-decoration: none;
     text-align: left;
-    color: aquamarine;
+    color: lightblue;
+}
+
+nav
+{
+    color: lightblue;
 }
 
 button 
@@ -40,4 +45,9 @@ button
 {
     background-color: #04AA6D;
     color: white;
+}
+
+.unit
+{
+    color: aquamarine;
 }

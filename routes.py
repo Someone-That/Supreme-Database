@@ -42,7 +42,7 @@ def home():
     return render_template("home.html", units=all_units)
 
 
-@app.route('/<int:id>')
+@app.route('/unit/<int:id>')
 def unit(id):
     connection = sqlite3.connect('supreme_db.db')
     unit_info = sql_statement(connection, f"""
@@ -55,6 +55,11 @@ GROUP BY id
 ORDER BY faction_name, tech_level""")
     # unit_info[0] = id, [1] = name, [2-7] = health, mass cost, energy cost, build time, tech level, faction
     return render_template("unit.html", unit_id=id, unit=unit_info[0])
+
+
+@app.route('/manage-units')
+def manage_units():
+    return render_template("manage_units.html")
 
 
 @app.errorhandler(404)  # 404 page
