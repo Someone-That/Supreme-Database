@@ -88,7 +88,7 @@ def iterate_through_file():
                 unit.mass_cost = get_number_from_line(line)
             if ' BuildTime =' in line:
                 unit.build_time = get_number_from_line(line)
-     
+
         if unit.current_section == "General":
             if 'UnitName =' in line:
                 unit.unit_name = get_name_from_line(line)

@@ -37,8 +37,8 @@ def home():
             result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
-        
-        all_units.append((unit[0],result))
+
+        all_units.append((unit[0], result))
     return render_template("home.html", units=all_units)
 
 
