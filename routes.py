@@ -42,6 +42,31 @@ def home():
     return render_template("home.html", units=all_units)
 
 
+@app.route('/faction/<string:faction>')
+def faction(faction):
+    connection = sqlite3.connect('supreme_db.db')
+    faction_extract = sql_statement(connection, f"""
+SELECT id, unit_name, tech_level, name, code FROM 
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+WHERE faction_name = '{faction}'
+GROUP BY id
+ORDER BY faction_name, tech_level""")
+    print(faction_extract)
+    all_units = []
+    for unit in faction_extract:  # put units in digestable form for website output
+        if unit[2] == 4:  # unit is experimental
+            result = f"{unit[3]} [{unit[4]}]"
+        else:
+            result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
+        if unit[1]:  # unit has a name
+            result = f"{unit[1]}: {result}"
+
+        all_units.append((unit[0], result))
+    return render_template("home.html", units=all_units)
+
+
 @app.route('/unit/<int:id>')
 def unit(id):
     connection = sqlite3.connect('supreme_db.db')
