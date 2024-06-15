@@ -1,6 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<h2>To access units, click on the desired faction in the navbar or the links provided here.</h2>
+
+<h2>
+<ul style="list-style: none;"> Factions:
+    <li><a href="/faction/UEF" class="uef_colour">UEF</a></li>
+    <li><a href="/faction/Aeon" class="aeon_colour">Aeon</a></li>
+    <li><a href="/faction/Cybran" class="cybran_colour">Cybran</a></li>
+    <li><a href="/faction/Seraphim" class="seraphim_colour">Seraphim</a></li>
+</ul>
+</h2>
+
+<h2>You can use this website for calculating optimal build orders, or refreshing yourself on unit names.</h2>
+
+<h2 id="filter-tutorial">To filter units, simply toggle the filters you desire that are located under the navbar during unit viewing.</h2>
+
+<h2>All units:</h2>
 {% for unit in units %} <!--loops through all the data neatly-->
     <h2><a href="/unit/{{unit[0]}}" class="unit">{{unit[0]}}. {{unit[1]}}</a></h2> <!--displays id, name-->
 {%endfor%}

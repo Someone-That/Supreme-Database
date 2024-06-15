@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% for unit in units %} <!--loops through all the data neatly-->
+    <h2><a href="/unit/{{unit[0]}}" class="unit">{{unit[0]}}. {{unit[1]}}</a></h2> <!--displays id, name-->
+{%endfor%}
+
+{% endblock %}

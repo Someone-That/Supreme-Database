@@ -53,7 +53,6 @@ JOIN Factions ON fid = faction_id
 WHERE faction_name = '{faction}'
 GROUP BY id
 ORDER BY faction_name, tech_level""")
-    print(faction_extract)
     all_units = []
     for unit in faction_extract:  # put units in digestable form for website output
         if unit[2] == 4:  # unit is experimental
@@ -64,7 +63,7 @@ ORDER BY faction_name, tech_level""")
             result = f"{unit[1]}: {result}"
 
         all_units.append((unit[0], result))
-    return render_template("home.html", units=all_units)
+    return render_template("faction.html", units=all_units)
 
 
 @app.route('/unit/<int:id>')
