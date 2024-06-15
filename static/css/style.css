@@ -46,7 +46,7 @@ header
     font-size: 1.2rem;
 }
 
-.faction_links li
+.faction_links li, ul li
 {
     display: inline-block;
     padding: 0px 10px;

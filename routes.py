@@ -28,17 +28,22 @@ def clean_up_data(data):
 @app.route('/')
 def home():
     connection = sqlite3.connect('supreme_db.db')
-    extraction = sql_statement(connection, "SELECT id, unit_name, tech_level, name, code FROM Units")
+    extraction = sql_statement(connection, """
+SELECT id, unit_name, tech_level, name, code, faction_name FROM 
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+GROUP BY id""")
     all_units = []
     for unit in extraction:  # put units in digestable form for website output
-        if unit[2] == 4:  # unit is experimental
+        if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
             result = f"{unit[3]} [{unit[4]}]"
         else:
             result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
-        all_units.append((unit[0], result))
+        all_units.append((unit[0], result, unit[5].lower()))
     return render_template("home.html", units=all_units)
 
 
@@ -46,7 +51,7 @@ def home():
 def faction(faction):
     connection = sqlite3.connect('supreme_db.db')
     faction_extract = sql_statement(connection, f"""
-SELECT id, unit_name, tech_level, name, code FROM 
+SELECT id, unit_name, tech_level, name, code, faction_name FROM 
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -55,14 +60,14 @@ GROUP BY id
 ORDER BY faction_name, tech_level""")
     all_units = []
     for unit in faction_extract:  # put units in digestable form for website output
-        if unit[2] == 4:  # unit is experimental
+        if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
             result = f"{unit[3]} [{unit[4]}]"
         else:
             result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
-        all_units.append((unit[0], result))
+        all_units.append((unit[0], result, unit[5].lower()))
     return render_template("faction.html", units=all_units)
 
 
