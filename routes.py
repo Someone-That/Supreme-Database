@@ -5,6 +5,12 @@ import sqlite3
 app = Flask(__name__)
 
 connection = sqlite3.connect('supreme_db.db')
+filters = {
+    "A": "Aeon",
+    "E": "UEF",
+    "R": "Cybran",
+    "S": "Seraphim"
+}
 
 
 def sql_statement(connection, sql):

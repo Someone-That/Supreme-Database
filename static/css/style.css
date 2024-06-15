@@ -93,6 +93,11 @@ header
     color: white;
 }
 
+.filter-buttons
+{
+    display: inline-block;
+}
+
 .unit
 {
     color: aquamarine;
