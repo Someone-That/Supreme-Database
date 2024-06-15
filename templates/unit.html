@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<a href="/"><button class="back">Back</button></a>
+<form><input type="button" value="Back" onclick="history.back()" class="back"></form>
 <h2>{{unit_id}}. {{unit[1]}}</h2>
 <h2>Health: {{unit[2]}}</h2>
 <h2>Mass cost: {{unit[3]}}</h2>
