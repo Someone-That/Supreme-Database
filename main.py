@@ -54,7 +54,7 @@ def show_units(connection, id_filter=0, disable_sort=False, tech_filter=[1, 2, 3
         filter = f"WHERE ({rf}) AND ({tf}) AND ({ff})"
         if id_filter:
             filter = filter + f" AND id = {id_filter}"
-        
+
         order = "ORDER BY faction_name, tech_level"
         if disable_sort:
             order = ""

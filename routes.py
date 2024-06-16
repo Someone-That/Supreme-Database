@@ -9,7 +9,7 @@ tech_filter = []
 faction_filter = []
 role_filter = []
 
-button_order = ['1','2','3','4',"UEF","Aeon","Cybran","Seraphim","Land","Air","Naval","Anti Air","Anti Naval"]
+button_order = ['1', '2', '3', '4', "UEF", "Aeon", "Cybran", "Seraphim", "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 button_toggles = [False, False, False, False, False, False, False, False, False, False, False, False, False]
 
 
@@ -48,19 +48,19 @@ def process_filter_button_pressed(data):
             tech_filter.remove(data[1])
         else:
             tech_filter.append(data[1])
-    
+
     if data[0] == "F":
         if data[1:] in faction_filter:
             faction_filter.remove(data[1:])
         else:
             faction_filter.append(data[1:])
-    
+
     if data[0] == "R":
         if data[1:] in role_filter:
             role_filter.remove(data[1:])
         else:
             role_filter.append(data[1:])
-    
+
     # tracks which button was pressed so the site can know which css toggle state to use for that button
     all_filters = tech_filter + faction_filter + role_filter
     data = data[1:]
@@ -70,20 +70,20 @@ def process_filter_button_pressed(data):
         button_toggles[button_order.index(data)] = False
 
 
-def construct_filter_statement(faction_site = ""):
+def construct_filter_statement(faction_site=""):
     '''uses filter lists to construct an sql WHERE statement which will contain all filters selected'''
     tf = ""
     for i in range(len(tech_filter)):
         tf = tf + f"tech_level = {tech_filter[i]}"
         if i < len(tech_filter)-1:
             tf = tf + " OR "
-    
+
     rf = ""
     for i in range(len(role_filter)):
         rf = rf + f"role_name = '{role_filter[i]}'"
         if i < len(role_filter)-1:
             rf = rf + " OR "
-    
+
     if faction_site:
         ff = f"faction_name = '{faction_site}'"
     else:
@@ -92,7 +92,7 @@ def construct_filter_statement(faction_site = ""):
             ff = ff + f"faction_name = '{faction_filter[i]}'"
             if i < len(faction_filter)-1:
                 ff = ff + " OR "
-    
+
     if not rf and not tf and not ff:  # no filters selected
         return ""
     filter = "WHERE "
@@ -106,7 +106,7 @@ def construct_filter_statement(faction_site = ""):
             filter = filter + f"({i})"
         else:
             filter = filter + f" AND ({i})"
-    
+
     return filter
 
 
@@ -114,7 +114,7 @@ def construct_filter_statement(faction_site = ""):
 def home():
     connection = sqlite3.connect('supreme_db.db')
     extraction = sql_statement(connection, f"""
-SELECT id, unit_name, tech_level, name, code, faction_name FROM 
+SELECT id, unit_name, tech_level, name, code, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -140,7 +140,7 @@ def home_filter_pressed():
     data = data[0]
 
     process_filter_button_pressed(data)
-    
+
     return redirect("/")
 
 
@@ -149,7 +149,7 @@ def faction(faction):
     connection = sqlite3.connect('supreme_db.db')
     filter = construct_filter_statement(faction)
     faction_extract = sql_statement(connection, f"""
-SELECT id, unit_name, tech_level, name, code, faction_name FROM 
+SELECT id, unit_name, tech_level, name, code, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -175,7 +175,7 @@ def filter_pressed(faction):
     data = data[0]
 
     process_filter_button_pressed(data)
-    
+
     return redirect(f"/faction/{faction}")
 
 
@@ -202,6 +202,11 @@ def manage_units():
 @app.route('/manage-units', methods=['POST'])
 def submitted_units():
     print(request.form)
+
+    # bullet proofing:
+
+    
+
     return redirect("/manage-units")
 
 
