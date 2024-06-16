@@ -1,6 +1,56 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>here you manage units</h2>
+<form method="post">
+    <label>Unit name:</label>
+    <input type="text" name="unit_name" placeholder="2-15 characters" size="12" value="">
+    <br><br>
+
+    <label>Unit health:</label>
+    <input type="text" name="unit_health" placeholder="2-15 characters" size="12" value="">
+    <br><br>
+
+    <label>Unit mass cost:</label>
+    <input type="text" name="unit_mass_cost" placeholder="2-15 characters" size="12" value="">
+    <br><br>
+
+    <label>Unit energy cost:</label>
+    <input type="text" name="unit_energy_cost" placeholder="2-15 characters" size="12" value="">
+    <br><br>
+
+    <label>Unit build time:</label>
+    <input type="text" name="unit_build_time" placeholder="2-15 characters" size="12" value="">
+    <br><br>
+
+    <label>Unit tech level:</label>
+    <select name="unit_tech_level">
+        <option value=""></option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">Experimental</option>
+    </select>
+    <br><br>
+    
+    <label>Unit faction:</label>
+    <select name="unit_faction">
+        <option value=""></option>
+        <option value="4">UEF</option>
+        <option value="3">Aeon</option>
+        <option value="2">Cybran</option>
+        <option value="1">Seraphim</option>
+    </select>
+    <br><br>
+
+    <label>Unit code:</label>
+    <input type="text" name="unit_code" placeholder="7 characters" size="7" value="">
+    <br><br>
+
+    <label>Unit's personal name:</label>
+    <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="12" value="">
+    <br><br>
+
+    <input type="submit" value="Submit">
+</form>
 
 {% endblock %}

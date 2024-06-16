@@ -199,6 +199,12 @@ def manage_units():
     return render_template("manage_units.html")
 
 
+@app.route('/manage-units', methods=['POST'])
+def submitted_units():
+    print(request.form)
+    return redirect("/manage-units")
+
+
 @app.errorhandler(404)  # 404 page
 def page_not_found(error):
     return render_template("404.html", title="cease this")
