@@ -1,13 +1,19 @@
 <div class="filter-buttons">
-<button>Tech 1</button>
-<button>Tech 2</button>
-<button>Tech 3</button>
-<button style="margin-right: 25px;">Tech 4</button>
-<button>UEF</button>
-<button>Aeon</button>
-<button>Cybran</button>
-<button style="margin-right: 25px;">Aeon</button>
-<button>Land</button>
-<button>Air</button>
-<button>Sea</button>
+    <form method="post">
+        <input type="submit" value="Tech 1" name="T1">
+        <input type="submit" value="Tech 2" name="T2">
+        <input type="submit" value="Tech 3" name="T3">
+        <input type="submit" value="Experimental" name="T4" style="margin-right: 25px;">
+        {% if not faction_site %}
+        <input type="submit" value="UEF" name="FUEF">
+        <input type="submit" value="Aeon" name="FAeon">
+        <input type="submit" value="Cybran" name="FCybran">
+        <input type="submit" value="Seraphim" name="FSeraphim" style="margin-right: 25px;">
+        {% endif %}
+        <input type="submit" value="Land" name="RLand">
+        <input type="submit" value="Air" name="RAir">
+        <input type="submit" value="Navy" name="RNavy">
+        <input type="submit" value="Anti-Air" name="RAnti Air">
+        <input type="submit" value="Anti-Navy" name="RAnti Naval">
+    </form>
 </div>
