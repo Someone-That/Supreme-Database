@@ -9,6 +9,9 @@ tech_filter = []
 faction_filter = []
 role_filter = []
 
+button_order = ['1','2','3','4',"UEF","Aeon","Cybran","Seraphim","Land","Air","Naval","Anti Air","Anti Naval"]
+button_toggles = [False, False, False, False, False, False, False, False, False, False, False, False, False]
+
 
 def sql_statement(connection, sql):
     '''executes sql statement'''
@@ -28,7 +31,47 @@ def clean_up_data(data):
     return clean_data
 
 
+def convert_button_toggles_to_css_class():
+    return_output = []
+    for toggle in button_toggles:
+        if toggle:
+            return_output.append("fb-on")
+        else:
+            return_output.append("fb-off")
+    return return_output
+
+
+def process_filter_button_pressed(data):
+    '''adds or removes selected filter from the filter lists'''
+    if data[0] == "T":
+        if data[1] in tech_filter:
+            tech_filter.remove(data[1])
+        else:
+            tech_filter.append(data[1])
+    
+    if data[0] == "F":
+        if data[1:] in faction_filter:
+            faction_filter.remove(data[1:])
+        else:
+            faction_filter.append(data[1:])
+    
+    if data[0] == "R":
+        if data[1:] in role_filter:
+            role_filter.remove(data[1:])
+        else:
+            role_filter.append(data[1:])
+    
+    # tracks which button was pressed so the site can know which css toggle state to use for that button
+    all_filters = tech_filter + faction_filter + role_filter
+    data = data[1:]
+    if data in all_filters:  # filter is selected
+        button_toggles[button_order.index(data)] = True
+    else:  # filter is unselected
+        button_toggles[button_order.index(data)] = False
+
+
 def construct_filter_statement(faction_site = ""):
+    '''uses filter lists to construct an sql WHERE statement which will contain all filters selected'''
     tf = ""
     for i in range(len(tech_filter)):
         tf = tf + f"tech_level = {tech_filter[i]}"
@@ -51,7 +94,7 @@ def construct_filter_statement(faction_site = ""):
                 ff = ff + " OR "
     
     if not rf and not tf and not ff:  # no filters selected
-        return
+        return ""
     filter = "WHERE "
     count = 0
     filter_list = [rf, tf, ff]
@@ -87,33 +130,17 @@ GROUP BY id""")
             result = f"{unit[1]}: {result}"
 
         all_units.append((unit[0], result, unit[5].lower()))
-    return render_template("home.html", units=all_units)
+
+    return render_template("home.html", units=all_units, button_toggles=convert_button_toggles_to_css_class())
 
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['POST'])  # user pressed filter button on homepage
 def home_filter_pressed():
     data = list(request.form)
     data = data[0]
 
-    if data[0] == "T":
-        if data[1] in tech_filter:
-            tech_filter.remove(data[1])
-        else:
-            tech_filter.append(data[1])
+    process_filter_button_pressed(data)
     
-    if data[0] == "F":
-        if data[1:] in faction_filter:
-            faction_filter.remove(data[1:])
-        else:
-            faction_filter.append(data[1:])
-    
-    if data[0] == "R":
-        if data[1:] in role_filter:
-            role_filter.remove(data[1:])
-        else:
-            role_filter.append(data[1:])
-    
-    print(tech_filter, role_filter, faction_filter)
     return redirect("/")
 
 
@@ -139,33 +166,16 @@ ORDER BY faction_name, tech_level""")
             result = f"{unit[1]}: {result}"
 
         all_units.append((unit[0], result, unit[5].lower()))
-    return render_template("faction.html", units=all_units, faction_site=faction)
+    return render_template("faction.html", units=all_units, faction_site=faction, button_toggles=convert_button_toggles_to_css_class())
 
 
-@app.route('/faction/<string:faction>', methods=['POST'])
+@app.route('/faction/<string:faction>', methods=['POST'])  # user pressed filter button on faction page
 def filter_pressed(faction):
     data = list(request.form)
     data = data[0]
 
-    if data[0] == "T":
-        if data[1] in tech_filter:
-            tech_filter.remove(data[1])
-        else:
-            tech_filter.append(data[1])
+    process_filter_button_pressed(data)
     
-    if data[0] == "F":
-        if data[1:] in faction_filter:
-            faction_filter.remove(data[1:])
-        else:
-            faction_filter.append(data[1:])
-    
-    if data[0] == "R":
-        if data[1:] in role_filter:
-            role_filter.remove(data[1:])
-        else:
-            role_filter.append(data[1:])
-    
-    print(tech_filter, role_filter, faction_filter)
     return redirect(f"/faction/{faction}")
 
 
