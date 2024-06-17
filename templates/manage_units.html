@@ -1,7 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<form method="post">
+<form id="manage units form" method="post">
+    <label>What would you like to do?</label>
+    <select id="submit desire" name="submit desire" onchange="submitForm()">
+        {#
+        {% if save_data['submit desire'] %}
+        <option value="{{save_data['submit desire']}}">{{save_data['submit desire']}}</option>
+        {% else %}
+        <option value=""></option>
+        {% endif %}#}
+        <option value="add">Add a unit</option>
+        <option value="update">Update a unit</option>
+        <option value="delete">Delete a unit</option>
+    </select>
+
+    <input type="hidden" id="is_submitting_desire" name="is_submitting_desire" value="false">
+
+    {% if desire == "delete" %}
+
+    {% elif desire %}
+
     <label>Unit name:</label>
     <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="">
     <br><br>
@@ -50,7 +69,18 @@
     <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="">
     <br><br>
 
+    {% endif %}
     <input type="submit" value="Submit">
 </form>
+
+<script>
+    function submitForm() {
+        const selectElement = document.getElementById('submit desire');
+        if (selectElement.value !== "") {
+            document.getElementById('is_submitting_desire').value = "true"
+            document.getElementById('manage units form').submit();
+        }
+    }
+</script>
 
 {% endblock %}

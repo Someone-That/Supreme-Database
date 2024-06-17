@@ -201,11 +201,31 @@ def manage_units():
 
 @app.route('/manage-units', methods=['POST'])
 def submitted_units():
-    # bullet proofing:
+    save_data = {
+    "unit_name": "",
+    "unit_health": "",
+    "unit_mass_cost": "",
+    "unit_energy_cist": "",
+    "unit_build_time": "",
+    "unit_tech_level": "",
+    "unit_faction": "",
+    "unit_code": "",
+    "unit_unit_name": ""}
 
     response = request.form
+    nt = {}  # nt = notification text
 
-    return redirect("/manage-units")
+    desire = ""
+    if response["is_submitting_desire"]:  # user submitted what they wanted to do rather than submitting a form
+        desire = response["submit desire"]
+
+    # bullet proofing:
+
+    # unit_name = response["unit_name"]
+    # if len(unit_name) < 2 or len(unit_name) > 25:
+    #     nt["unit_name"] = "Keep length between 2-25 characters."
+
+    return render_template("manage_units.html", desire=desire)
 
 
 @app.errorhandler(404)  # 404 page
