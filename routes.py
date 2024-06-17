@@ -201,11 +201,9 @@ def manage_units():
 
 @app.route('/manage-units', methods=['POST'])
 def submitted_units():
-    print(request.form)
-
     # bullet proofing:
 
-    
+    response = request.form
 
     return redirect("/manage-units")
 
