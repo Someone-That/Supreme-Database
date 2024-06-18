@@ -201,7 +201,9 @@ def manage_units():
 
 @app.route('/manage-units', methods=['POST'])
 def submitted_units():
+    connection = sqlite3.connect('supreme_db.db')
     save_data = {
+    "submit desire": "",
     "unit_name": "",
     "unit_health": "",
     "unit_mass_cost": "",
@@ -216,8 +218,27 @@ def submitted_units():
     nt = {}  # nt = notification text
 
     desire = ""
+    all_units = []
     if response["is_submitting_desire"]:  # user submitted what they wanted to do rather than submitting a form
         desire = response["submit desire"]
+    
+    if desire == "delete" or desire == "update":
+        extraction = sql_statement(connection, """
+SELECT id, unit_name, tech_level, name, code FROM
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+GROUP BY id""")
+        for unit in extraction:  # put units in digestable form for website output
+            if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
+                result = f"{unit[3]}"
+            else:
+                result = f"T{unit[2]} {unit[3]}"  # example output: T1 Engineer [UAL0105]
+            if unit[1]:  # unit has a name
+                result = f"{unit[1]}: {result}"
+            result = f"{unit[0]}. {result}"
+
+            all_units.append((unit[0], result))
 
     # bullet proofing:
 
@@ -225,7 +246,7 @@ def submitted_units():
     # if len(unit_name) < 2 or len(unit_name) > 25:
     #     nt["unit_name"] = "Keep length between 2-25 characters."
 
-    return render_template("manage_units.html", desire=desire)
+    return render_template("manage_units.html", desire=desire, units=all_units)
 
 
 @app.errorhandler(404)  # 404 page

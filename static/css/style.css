@@ -157,3 +157,9 @@ header
 {
     color: rgb(250, 234, 110);
 }
+
+.select2-results__option
+{
+    color: black;
+    width: 93%;
+}
