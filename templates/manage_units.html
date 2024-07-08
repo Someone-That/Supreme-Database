@@ -4,15 +4,14 @@
 <form id="manage units form" method="post">
     <label>What would you like to do?</label>
     <select id="submit desire" name="submit desire" onchange="submitForm()">
-        {#
         {% if save_data['submit desire'] %}
         <option value="{{save_data['submit desire']}}">{{save_data['submit desire']}}</option>
         {% else %}
         <option value=""></option>
-        {% endif %}#}
-        <option value="add">Add a unit</option>
-        <option value="update">Update a unit</option>
-        <option value="delete">Delete a unit</option>
+        {% endif %}
+        {% if save_data['submit desire'] != "Add a unit" %}<option value="add">Add a unit</option>{% endif %}
+        {% if save_data['submit desire'] != "Update a unit" %}<option value="update">Update a unit</option>{% endif %}
+        {% if save_data['submit desire'] != "Delete a unit" %}<option value="delete">Delete a unit</option>{% endif %}
     </select>
     <br><br>
 

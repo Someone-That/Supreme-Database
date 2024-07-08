@@ -196,7 +196,7 @@ ORDER BY faction_name, tech_level""")
 
 @app.route('/manage-units')
 def manage_units():
-    return render_template("manage_units.html")
+    return render_template("manage_units.html", save_data={})
 
 
 @app.route('/manage-units', methods=['POST'])
@@ -215,6 +215,13 @@ def submitted_units():
     "unit_unit_name": ""}
 
     response = request.form
+
+    value_vs_display = {
+    "add": "Add a unit",
+    "update": "Update a unit",
+    "delete": "Delete a unit"
+    }
+    save_data["submit desire"] = value_vs_display[response["submit desire"]]
     nt = {}  # nt = notification text
 
     desire = ""
@@ -246,7 +253,7 @@ GROUP BY id""")
     # if len(unit_name) < 2 or len(unit_name) > 25:
     #     nt["unit_name"] = "Keep length between 2-25 characters."
 
-    return render_template("manage_units.html", desire=desire, units=all_units)
+    return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data)
 
 
 @app.errorhandler(404)  # 404 page
