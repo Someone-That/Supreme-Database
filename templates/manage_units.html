@@ -3,39 +3,47 @@
 
 <form id="manage units form" method="post">
     <label>What would you like to do?</label>
-    <select id="submit desire" name="submit desire" onchange="submitForm()">
-        {% if save_data['submit desire'] %}
-        <option value="{{save_data['submit desire']}}">{{save_data['submit desire']}}</option>
+    <select id="submit desire" name="submit desire" onchange="submitAction('submitting desire')">
+        {% if save_data['submit desire value'] %}
+        <option value="{{save_data['submit desire value']}}">{{save_data['submit desire display']}}</option>
         {% else %}
         <option value=""></option>
         {% endif %}
-        {% if save_data['submit desire'] != "Add a unit" %}<option value="add">Add a unit</option>{% endif %}
-        {% if save_data['submit desire'] != "Update a unit" %}<option value="update">Update a unit</option>{% endif %}
-        {% if save_data['submit desire'] != "Delete a unit" %}<option value="delete">Delete a unit</option>{% endif %}
+        {% if save_data['submit desire display'] != "Add a unit" %}<option value="add">Add a unit</option>{% endif %}
+        {% if save_data['submit desire display'] != "Update a unit" %}<option value="update">Update a unit</option>{% endif %}
+        {% if save_data['submit desire display'] != "Delete a unit" %}<option value="delete">Delete a unit</option>{% endif %}
     </select>
     <br><br>
 
-    <input type="hidden" id="is_submitting_desire" name="is_submitting_desire" value="false">
+    <input type="hidden" id="is_submitting_desire" name="form_action" value="submit form">
 
     {% if desire == "delete" %}
 
     <label>Select the unit you would like to delete:</label>
-    <select class="s2" name="unit_id" style="width: 20%">
+    <select class="s2" name="delete_unit_id" style="width: 20%" onchange="submitAction('selecting unit to delete')">
+        {% if save_data['delete unit'] %}
+        <option value="{{save_data['delete unit id']}}">{{save_data['delete unit']}}</option>
+        {% else %}
         <option value=""></option>
+        {% endif %}
         {% for unit in units %}
         <option value="{{unit[0]}}">{{unit[1]}}</option>
         {% endfor %}
     </select>
     <br><br>
 
-    <input type="submit" value="Submit">
+    {% if save_data['delete unit'] %}<input type="submit" value="Submit">{% endif %}
 
     {% elif desire %}
 
     {% if desire == "update" %}
     <label>Select the unit you would like to update:</label>
-    <select class="s2" name="unit_id" style="width: 20%">
+    <select class="s2" name="update_unit_id" style="width: 20%" onchange="submitAction('selecting unit to update')">
+        {% if save_data['update unit'] %}
+        <option value="{{save_data['update unit id']}}">{{save_data['update unit']}}</option>
+        {% else %}
         <option value=""></option>
+        {% endif %}
         {% for unit in units %}
         <option value="{{unit[0]}}">{{unit[1]}}</option>
         {% endfor %}
@@ -45,23 +53,23 @@
     {% endif %}
 
     <label>Unit name:</label>
-    <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="">
+    <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_name']}}">
     <br><br>
 
     <label>Unit health:</label>
-    <input type="text" name="unit_health" placeholder="1-7 characters" size="9" value="">
+    <input type="text" name="unit_health" placeholder="1-7 characters" size="9" value="{{save_data['unit_health']}}">
     <br><br>
 
     <label>Unit mass cost:</label>
-    <input type="text" name="unit_mass_cost" placeholder="1-7 characters" size="9" value="">
+    <input type="text" name="unit_mass_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_mass_cost']}}">
     <br><br>
 
     <label>Unit energy cost:</label>
-    <input type="text" name="unit_energy_cost" placeholder="1-7 characters" size="9" value="">
+    <input type="text" name="unit_energy_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_energy_cost']}}">
     <br><br>
 
     <label>Unit build time:</label>
-    <input type="text" name="unit_build_time" placeholder="1-7 characters" size="9" value="">
+    <input type="text" name="unit_build_time" placeholder="1-7 characters" size="9" value="{{save_data['unit_build_time']}}">
     <br><br>
 
     <label>Unit tech level:</label>
@@ -85,11 +93,11 @@
     <br><br>
 
     <label>Unit code:</label>
-    <input type="text" name="unit_code" placeholder="7 characters" size="7" value="">
+    <input type="text" name="unit_code" placeholder="7 characters" size="7" value="{{save_data['unit_code']}}">
     <br><br>
 
     <label>Unit's personal name:</label>
-    <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="">
+    <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_unit_name']}}">
     <br><br>
 
     <input type="submit" value="Submit">
@@ -103,12 +111,9 @@
     $(".s2").select2();
     });
 
-    function submitForm() {
-        const selectElement = document.getElementById('submit desire');
-        if (selectElement.value !== "") {
-            document.getElementById('is_submitting_desire').value = "true"
-            document.getElementById('manage units form').submit();
-        }
+    function submitAction(action) {
+        document.getElementById('is_submitting_desire').value = action
+        document.getElementById('manage units form').submit();
     }
 </script>
 

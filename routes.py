@@ -3,22 +3,23 @@ import sqlite3
 
 
 app = Flask(__name__)
-
-connection = sqlite3.connect('supreme_db.db')
+DATABASE_FILE = "supreme_db.db"
 tech_filter = []
 faction_filter = []
 role_filter = []
+
 
 button_order = ['1', '2', '3', '4', "UEF", "Aeon", "Cybran", "Seraphim", "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 button_toggles = [False, False, False, False, False, False, False, False, False, False, False, False, False]
 
 
-def sql_statement(connection, sql):
+def sql_statement(sql):
     '''executes sql statement'''
     try:
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        return cursor.fetchall()
+        with sqlite3.connect(DATABASE_FILE) as connection:
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            return cursor.fetchall()
     except:
         return
 
@@ -112,8 +113,7 @@ def construct_filter_statement(faction_site=""):
 
 @app.route('/')
 def home():
-    connection = sqlite3.connect('supreme_db.db')
-    extraction = sql_statement(connection, f"""
+    extraction = sql_statement(f"""
 SELECT id, unit_name, tech_level, name, code, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
@@ -146,9 +146,8 @@ def home_filter_pressed():
 
 @app.route('/faction/<string:faction>')
 def faction(faction):
-    connection = sqlite3.connect('supreme_db.db')
     filter = construct_filter_statement(faction)
-    faction_extract = sql_statement(connection, f"""
+    faction_extract = sql_statement(f"""
 SELECT id, unit_name, tech_level, name, code, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
@@ -181,8 +180,7 @@ def filter_pressed(faction):
 
 @app.route('/unit/<int:id>')
 def unit(id):
-    connection = sqlite3.connect('supreme_db.db')
-    unit_info = sql_statement(connection, f"""
+    unit_info = sql_statement(f"""
 SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
@@ -201,9 +199,11 @@ def manage_units():
 
 @app.route('/manage-units', methods=['POST'])
 def submitted_units():
-    connection = sqlite3.connect('supreme_db.db')
-    save_data = {
-    "submit desire": "",
+    response = request.form
+
+    empty_save_data = {
+    "suubmit desire value": "",
+    "submit desire display": "",
     "unit_name": "",
     "unit_health": "",
     "unit_mass_cost": "",
@@ -214,23 +214,27 @@ def submitted_units():
     "unit_code": "",
     "unit_unit_name": ""}
 
-    response = request.form
+    save_data = dict(response)
 
     value_vs_display = {
     "add": "Add a unit",
     "update": "Update a unit",
-    "delete": "Delete a unit"
+    "delete": "Delete a unit",
     }
-    save_data["submit desire"] = value_vs_display[response["submit desire"]]
-    nt = {}  # nt = notification text
+    save_data["submit desire display"] = value_vs_display[response["submit desire"]]
+    save_data["submit desire value"] = response["submit desire"]
 
     desire = ""
     all_units = []
-    if response["is_submitting_desire"]:  # user submitted what they wanted to do rather than submitting a form
-        desire = response["submit desire"]
+    form_action = response["form_action"]
+    desire = response["submit desire"]
+
+    if form_action == "submit form" and desire == "delete":  # user submitted a unit for deletion
+        sql_statement(f"DELETE FROM Units WHERE id = {int(save_data['delete_unit_id'])};")
+        sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {int(save_data['delete_unit_id'])};")
     
     if desire == "delete" or desire == "update":
-        extraction = sql_statement(connection, """
+        extraction = sql_statement("""
 SELECT id, unit_name, tech_level, name, code FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
@@ -245,7 +249,53 @@ GROUP BY id""")
                 result = f"{unit[1]}: {result}"
             result = f"{unit[0]}. {result}"
 
+            if form_action == "selecting unit to update" and int(save_data["update_unit_id"]) == unit[0]:
+                save_data["update unit id"] = unit[0]
+                save_data["update unit"] = result
+                continue
+            if form_action == "selecting unit to delete" and int(save_data["delete_unit_id"]) == unit[0]:
+                save_data["delete unit id"] = unit[0]
+                save_data["delete unit"] = result
+                continue
             all_units.append((unit[0], result))
+    
+    if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
+        return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data)
+
+    empty_save_data = {
+    "suubmit desire value": "",
+    "submit desire display": "",
+    "unit_name": "",
+    "unit_health": "",
+    "unit_mass_cost": "",
+    "unit_energy_cist": "",
+    "unit_build_time": "",
+    "unit_tech_level": "",
+    "unit_faction": "",
+    "unit_code": "",
+    "unit_unit_name": ""}
+    if form_action == "selecting unit to update":  # user selected a unit to update, commence fill in code
+        unit_id = int(save_data["update_unit_id"])
+        unit_info = sql_statement(f"""
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, fid, code, unit_name FROM
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+WHERE id = {unit_id}
+GROUP BY id
+ORDER BY faction_name, tech_level""")
+        unit_info = unit_info[0]
+        save_data["unit_name"] = unit_info[1]
+        save_data["unit_health"] = unit_info[2]
+        save_data["unit_mass_cost"] = unit_info[3]
+        save_data["unit_energy_cost"] = unit_info[4]
+        save_data["unit_build_time"] = unit_info[5]
+        save_data["unit_tech_level"] = unit_info[6]
+        save_data["unit_faction_name"] = unit_info[7]
+        save_data["unit_faction_id"] = unit_info[8]
+        save_data["unit_code"] = unit_info[9]
+        save_data["unit_unit_name"] = unit_info[10]
+
 
     # bullet proofing:
 
