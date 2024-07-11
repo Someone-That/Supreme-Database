@@ -19,6 +19,7 @@
 
     {% if desire == "delete" %}
 
+    {% if nt['successful termination'] %}<p>{{nt['successful termination']}}</p>{% endif %}
     <label>Select the unit you would like to delete:</label>
     <select class="s2" name="delete_unit_id" style="width: 20%" onchange="submitAction('selecting unit to delete')">
         {% if save_data['delete unit'] %}

@@ -111,6 +111,26 @@ def construct_filter_statement(faction_site=""):
     return filter
 
 
+def construct_unit_title(unit_id):
+    unit = sql_statement(f"""
+SELECT id, unit_name, tech_level, name, code FROM
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+WHERE id = {unit_id}
+GROUP BY id""")
+    unit = unit[0]
+    # put units in digestable form for website output
+    if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
+        result = f"{unit[3]}"
+    else:
+        result = f"T{unit[2]} {unit[3]}"  # example output: T1 Engineer [UAL0105]
+    if unit[1]:  # unit has a name
+        result = f"{unit[1]}: {result}"
+    result = f"{unit[0]}. {result}"
+    return result
+
+
 @app.route('/')
 def home():
     extraction = sql_statement(f"""
@@ -194,12 +214,14 @@ ORDER BY faction_name, tech_level""")
 
 @app.route('/manage-units')
 def manage_units():
-    return render_template("manage_units.html", save_data={})
+    return render_template("manage_units.html", save_data={}, nt={})
 
 
 @app.route('/manage-units', methods=['POST'])
 def submitted_units():
     response = request.form
+
+    nt = {}  # notifcation text
 
     empty_save_data = {
     "suubmit desire value": "",
@@ -230,8 +252,10 @@ def submitted_units():
     desire = response["submit desire"]
 
     if form_action == "submit form" and desire == "delete":  # user submitted a unit for deletion
-        sql_statement(f"DELETE FROM Units WHERE id = {int(save_data['delete_unit_id'])};")
-        sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {int(save_data['delete_unit_id'])};")
+        delete_unit_id = int(save_data['delete_unit_id'])
+        nt["successful termination"] = f"{construct_unit_title(delete_unit_id)} has been successfully terminated. 🤗"
+        sql_statement(f"DELETE FROM Units WHERE id = {delete_unit_id};")
+        sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {delete_unit_id};")
     
     if desire == "delete" or desire == "update":
         extraction = sql_statement("""
@@ -260,20 +284,11 @@ GROUP BY id""")
             all_units.append((unit[0], result))
     
     if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
-        return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data)
+        return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
+    
+    if form_action == "submit form" and desire == "add":  # user submitted a unit to add
+        pass
 
-    empty_save_data = {
-    "suubmit desire value": "",
-    "submit desire display": "",
-    "unit_name": "",
-    "unit_health": "",
-    "unit_mass_cost": "",
-    "unit_energy_cist": "",
-    "unit_build_time": "",
-    "unit_tech_level": "",
-    "unit_faction": "",
-    "unit_code": "",
-    "unit_unit_name": ""}
     if form_action == "selecting unit to update":  # user selected a unit to update, commence fill in code
         unit_id = int(save_data["update_unit_id"])
         unit_info = sql_statement(f"""
@@ -303,7 +318,7 @@ ORDER BY faction_name, tech_level""")
     # if len(unit_name) < 2 or len(unit_name) > 25:
     #     nt["unit_name"] = "Keep length between 2-25 characters."
 
-    return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data)
+    return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
 
 
 @app.errorhandler(404)  # 404 page
