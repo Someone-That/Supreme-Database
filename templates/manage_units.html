@@ -19,7 +19,7 @@
 
     {% if desire == "delete" %}
 
-    {% if nt['successful termination'] %}<p>{{nt['successful termination']}}</p>{% endif %}
+    {% if nt['successful termination'] %}<label class="notification-text">{{nt['successful termination']}}</label>{% endif %}
     <label>Select the unit you would like to delete:</label>
     <select class="s2" name="delete_unit_id" style="width: 20%" onchange="submitAction('selecting unit to delete')">
         {% if save_data['delete unit'] %}
@@ -55,27 +55,46 @@
 
     <label>Unit name:</label>
     <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_name']}}">
+    {% if nt['unit_name'] %}<label class="notification-text"> {{nt['unit_name']}}</label>{% endif %}
     <br><br>
 
     <label>Unit health:</label>
     <input type="text" name="unit_health" placeholder="1-7 characters" size="9" value="{{save_data['unit_health']}}">
+    {% if nt['unit_health'] %}<label class="notification-text"> {{nt['unit_health']}}</label>{% endif %}
     <br><br>
 
     <label>Unit mass cost:</label>
     <input type="text" name="unit_mass_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_mass_cost']}}">
+    {% if nt['unit_mass_cost'] %}<label class="notification-text"> {{nt['unit_mass_cost']}}</label>{% endif %}
     <br><br>
 
     <label>Unit energy cost:</label>
     <input type="text" name="unit_energy_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_energy_cost']}}">
+    {% if nt['unit_energy_cost'] %}<label class="notification-text"> {{nt['unit_energy_cost']}}</label>{% endif %}
     <br><br>
 
     <label>Unit build time:</label>
     <input type="text" name="unit_build_time" placeholder="1-7 characters" size="9" value="{{save_data['unit_build_time']}}">
+    {% if nt['unit_build_time'] %}<label class="notification-text"> {{nt['unit_build_time']}}</label>{% endif %}
     <br><br>
 
-    <label>Unit tech level:</label>
+    <label>Unit roles:</label>
+    {% if nt['unit_roles'] %}<label class="notification-text"> {{nt['unit_roles']}}</label>{% endif %}
+    <br>
+    <input type="checkbox" id="Land" name="Land" value="Land" {% if 'Land' in save_data %}checked="checked"{% endif %}>
+    <label for="Land"> Land</label><br>
+    <input type="checkbox" id="Air" name="Air" value="Air" {% if 'Air' in save_data %}checked="checked"{% endif %}>
+    <label for="Air"> Air</label><br>
+    <input type="checkbox" id="Navy" name="Navy" value="Navy" {% if 'Navy' in save_data %}checked="checked"{% endif %}>
+    <label for="Navy"> Navy</label><br>
+    <input type="checkbox" id="Anti Air" name="Anti Air" value="Anti Air" {% if 'Anti Air' in save_data %}checked="checked"{% endif %}>
+    <label for="Anti Air"> Anti-Air</label><br>
+    <input type="checkbox" id="Anti Naval" name="Anti Naval" value="Anti Naval" {% if 'Anti Naval' in save_data %}checked="checked"{% endif %}>
+    <label for="Anti Naval"> Anti-Navy</label>
+    <br><br>
+
+    <label>Unit tech level:</label> {% if nt['unit_tech_level'] %}<label class="notification-text"> {{nt['unit_tech_level']}}</label>{% endif %}
     <select name="unit_tech_level">
-        <option value=""></option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -83,9 +102,8 @@
     </select>
     <br><br>
     
-    <label>Unit faction:</label>
+    <label>Unit faction:</label> {% if nt['unit_faction'] %}<label class="notification-text"> {{nt['unit_faction']}}</label>{% endif %}
     <select name="unit_faction">
-        <option value=""></option>
         <option value="4">UEF</option>
         <option value="3">Aeon</option>
         <option value="2">Cybran</option>
@@ -95,10 +113,12 @@
 
     <label>Unit code:</label>
     <input type="text" name="unit_code" placeholder="7 characters" size="7" value="{{save_data['unit_code']}}">
+    {% if nt['unit_code'] %}<label class="notification-text"> {{nt['unit_code']}}</label>{% endif %}
     <br><br>
 
     <label>Unit's personal name:</label>
     <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_unit_name']}}">
+    {% if nt['unit_unit_name'] %}<label class="notification-text"> {{nt['unit_unit_name']}}</label>{% endif %}
     <br><br>
 
     <input type="submit" value="Submit">

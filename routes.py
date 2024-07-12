@@ -131,6 +131,86 @@ GROUP BY id""")
     return result
 
 
+def validate_stat(min, max, type, stat):  # there are 4 types: text, number, personal name
+    if type == "personal name":
+        if sql_statement(f"SELECT name FROM Units WHERE unit_name = {stat}"):  # personal name is taken
+            return "Unit's personal name already exists, choose another."
+
+    if type == "number":
+        try:
+            int(stat)
+        except ValueError:
+            return "Number input needed."
+
+    stat_length = len(stat)
+    
+    if stat_length == 0:
+        return "Missing input."
+    if stat_length < min:
+        return "Too little characters."
+    if stat_length > max:
+        return "Too many characters."
+
+
+def validate_unit(save_data):
+    nt = {}
+    nt["unit_name"] = validate_stat(2, 25, "text", save_data["unit_name"])
+    nt["unit_health"] = validate_stat(1, 7, "number", save_data["unit_health"])
+    nt["unit_mass_cost"] = validate_stat(1, 7, "number", save_data["unit_mass_cost"])
+    nt["unit_energy_cost"] = validate_stat(1, 7, "number", save_data["unit_energy_cost"])
+    nt["unit_build_time"] = validate_stat(1, 7, "number", save_data["unit_build_time"])
+    nt["unit_code"] = validate_stat(7, 7, "text", save_data["unit_code"])
+    nt["unit_unit_name"] = validate_stat(2, 25, "personal name", save_data["unit_unit_name"])
+
+    has_role = False
+    roles = ["Land", "Air", "Navy", "Anti Air", "Anti Naval"]
+    for role in roles:
+        if role in save_data:
+            has_role = True
+            break
+    if not has_role:
+        nt["unit_roles"] = "Missing input."
+    
+    return nt
+
+
+def delete_unit_from_supreme_database(unit_id):
+    sql_statement(f"DELETE FROM Units WHERE id = {unit_id};")
+    sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {unit_id};")
+
+
+def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save_data
+    # assign unit id
+    if do_not_create_new_id:
+        unit_id = do_not_create_new_id
+    else:
+        all_ids = sql_statement("SELECT id from Units")
+        highest_id = 1
+        for id in all_ids:
+            if id[0] > highest_id:
+                highest_id = id[0]
+        highest_id += 1
+        unit_id = highest_id
+
+    #  insert unit data
+    sql_statement(f"INSERT INTO Units VALUES ({unit_id}, '{sd['unit_name']}', {sd['unit_health']}, {sd['unit_mass_cost']}, {sd['unit_energy_cost']}, {sd['unit_build_time']}, {sd['unit_tech_level']}, {sd['unit_faction']}, '{sd['unit_code']}', '{sd['unit_unit_name']}');")
+
+    #  insert unit roles
+    unit_roles = []
+    roles = ["Land", "Air", "Navy", "Anti Air", "Anti Naval"]
+    for role in roles:
+        if role in sd:
+            unit_roles.append(role)
+
+    for role in unit_roles:
+        #  get role id
+        results = sql_statement(f"SELECT role_id FROM Roles WHERE role_name = '{role}'")
+        role_id = results[0][0]
+
+        #  insert unit into role
+        sql_statement(f"INSERT INTO Unit_Roles VALUES ({unit_id}, {role_id});")
+
+
 @app.route('/')
 def home():
     extraction = sql_statement(f"""
@@ -223,19 +303,6 @@ def submitted_units():
 
     nt = {}  # notifcation text
 
-    empty_save_data = {
-    "suubmit desire value": "",
-    "submit desire display": "",
-    "unit_name": "",
-    "unit_health": "",
-    "unit_mass_cost": "",
-    "unit_energy_cist": "",
-    "unit_build_time": "",
-    "unit_tech_level": "",
-    "unit_faction": "",
-    "unit_code": "",
-    "unit_unit_name": ""}
-
     save_data = dict(response)
 
     value_vs_display = {
@@ -245,6 +312,9 @@ def submitted_units():
     }
     save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     save_data["submit desire value"] = response["submit desire"]
+    empty_save_data = {}
+    empty_save_data["submit desire display"] = value_vs_display[response["submit desire"]]
+    empty_save_data["submit desire value"] = response["submit desire"]
 
     desire = ""
     all_units = []
@@ -254,10 +324,9 @@ def submitted_units():
     if form_action == "submit form" and desire == "delete":  # user submitted a unit for deletion
         delete_unit_id = int(save_data['delete_unit_id'])
         nt["successful termination"] = f"{construct_unit_title(delete_unit_id)} has been successfully terminated. 🤗"
-        sql_statement(f"DELETE FROM Units WHERE id = {delete_unit_id};")
-        sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {delete_unit_id};")
+        delete_unit_from_supreme_database(delete_unit_id)
     
-    if desire == "delete" or desire == "update":
+    if desire == "delete" or desire == "update":  # user selected they would like to delete or update a unit
         extraction = sql_statement("""
 SELECT id, unit_name, tech_level, name, code FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
@@ -285,14 +354,11 @@ GROUP BY id""")
     
     if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
         return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
-    
-    if form_action == "submit form" and desire == "add":  # user submitted a unit to add
-        pass
 
     if form_action == "selecting unit to update":  # user selected a unit to update, commence fill in code
         unit_id = int(save_data["update_unit_id"])
         unit_info = sql_statement(f"""
-SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, fid, code, unit_name FROM
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, fid, code, unit_name, role_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -310,6 +376,22 @@ ORDER BY faction_name, tech_level""")
         save_data["unit_faction_id"] = unit_info[8]
         save_data["unit_code"] = unit_info[9]
         save_data["unit_unit_name"] = unit_info[10]
+    
+        for role_entry in unit_info:
+            print(role_entry[11])
+            #save_data[role_entry[11]] = role_entry
+    
+    if form_action == "submit form" and desire == "add":  # user submitted a unit to add
+        nt = validate_unit(save_data)
+
+        has_error = False
+        for error in nt.values():  # checks for complaints
+            if error != None:  # complaint detected
+                has_error = True
+                break
+        if not has_error:  # no errors found with unit
+            save_data = empty_save_data
+            # add unit to supreme database
 
 
     # bullet proofing:

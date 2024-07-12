@@ -21,6 +21,11 @@ header
     padding: 0px 5%;
 }
 
+.notification-text
+{
+    color: red;
+}
+
 .mub 
 {
     margin-left: 35px;
