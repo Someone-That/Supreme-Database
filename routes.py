@@ -7,6 +7,9 @@ DATABASE_FILE = "supreme_db.db"
 tech_filter = []
 faction_filter = []
 role_filter = []
+all_roles = ["Land", "Air", "Navy", "Anti Air", "Anti Naval"]
+all_tech_levels = [(1,1),(2,2),(3,3),(4,"Experimental")]
+all_factions = [(4,"UEF"),(3,"Aeon"),(2,"Cybran"),(1,"Seraphim")]
 
 
 button_order = ['1', '2', '3', '4', "UEF", "Aeon", "Cybran", "Seraphim", "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
@@ -152,6 +155,27 @@ def validate_stat(min, max, type, stat):  # there are 4 types: text, number, per
         return "Too many characters."
 
 
+def fill_in_tech_level_and_faction(save_data, unit_tech_level, unit_faction):
+    '''function for saving the tech level and faction input data'''
+    save_data = save_data
+    if "unit_tech_levels" in save_data:
+        save_data.pop("unit_tech_levels")
+    if "unit_factions" in save_data:
+        save_data.pop("unit_factions")
+    
+    unit_tech_levels = list(all_tech_levels)
+    unit_tech_levels.insert(0, unit_tech_levels.pop(unit_tech_level-1))
+    save_data["unit_tech_levels"] = unit_tech_levels
+
+    unit_factions = all_factions
+    for i in range(len(all_factions)):
+        if all_factions[i][0] == unit_faction:
+            unit_factions.insert(0, unit_factions.pop(i))
+    save_data["unit_factions"] = unit_factions
+
+    return save_data
+
+
 def validate_unit(save_data):
     nt = {}
     nt["unit_name"] = validate_stat(2, 25, "text", save_data["unit_name"])
@@ -163,8 +187,7 @@ def validate_unit(save_data):
     nt["unit_unit_name"] = validate_stat(2, 25, "personal name", save_data["unit_unit_name"])
 
     has_role = False
-    roles = ["Land", "Air", "Navy", "Anti Air", "Anti Naval"]
-    for role in roles:
+    for role in all_roles:
         if role in save_data:
             has_role = True
             break
@@ -219,7 +242,8 @@ Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
 {construct_filter_statement()}
-GROUP BY id""")
+GROUP BY id
+ORDER BY id""")
     all_units = []
     for unit in extraction:  # put units in digestable form for website output
         if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
@@ -312,6 +336,7 @@ def submitted_units():
     }
     save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     save_data["submit desire value"] = response["submit desire"]
+    save_data = fill_in_tech_level_and_faction(save_data, int(save_data["unit_tech_level"]), int(save_data["unit_faction"]))
     empty_save_data = {}
     empty_save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     empty_save_data["submit desire value"] = response["submit desire"]
@@ -325,6 +350,54 @@ def submitted_units():
         delete_unit_id = int(save_data['delete_unit_id'])
         nt["successful termination"] = f"{construct_unit_title(delete_unit_id)} has been successfully terminated. 🤗"
         delete_unit_from_supreme_database(delete_unit_id)
+
+    if form_action == "selecting unit to update":  # user selected a unit to update, commence fill in code
+        unit_id = int(save_data["update_unit_id"])
+        unit_extraction = sql_statement(f"""
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, fid, code, unit_name, role_name FROM
+Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
+JOIN Roles ON Roles.role_id = Unit_Roles.rid
+JOIN Factions ON fid = faction_id
+WHERE id = {unit_id}
+ORDER BY faction_name, tech_level""")
+        unit_info = unit_extraction[0]
+        save_data["unit_name"] = unit_info[1]
+        save_data["unit_health"] = unit_info[2]
+        save_data["unit_mass_cost"] = unit_info[3]
+        save_data["unit_energy_cost"] = unit_info[4]
+        save_data["unit_build_time"] = unit_info[5]
+        unit_tech_level = int(unit_info[6])
+        unit_faction_id = int(unit_info[8])
+        save_data["unit_code"] = unit_info[9]
+        save_data["unit_unit_name"] = unit_info[10]
+
+        save_data = fill_in_tech_level_and_faction(save_data, unit_tech_level, unit_faction_id)
+
+        for role in all_roles:
+            if role in save_data:
+                save_data.pop(role)
+    
+        for role_entry in unit_extraction:
+            save_data[role_entry[11]] = role_entry[11]
+    
+    if form_action == "submit form" and (desire == "add" or desire == "update"):  # user submitted a unit to add or update
+        nt = validate_unit(save_data)
+
+        has_error = False
+        for error in nt.values():  # checks for complaints
+            if error != None:  # complaint detected
+                has_error = True
+                break
+        if not has_error and desire == "add":  # no errors found with unit and desire == add
+            add_unit_to_supreme_database(save_data)
+            save_data = empty_save_data
+        
+        elif not has_error and desire == "update":  # no errors found with unit and desire == update
+            update_unit_id = int(save_data['update_unit_id'])
+            nt["successful update"] = f"{construct_unit_title(update_unit_id)} has been successfully updated."
+            delete_unit_from_supreme_database(update_unit_id)
+            add_unit_to_supreme_database(save_data, update_unit_id)
+            save_data = empty_save_data
     
     if desire == "delete" or desire == "update":  # user selected they would like to delete or update a unit
         extraction = sql_statement("""
@@ -342,7 +415,7 @@ GROUP BY id""")
                 result = f"{unit[1]}: {result}"
             result = f"{unit[0]}. {result}"
 
-            if form_action == "selecting unit to update" and int(save_data["update_unit_id"]) == unit[0]:
+            if (form_action == "selecting unit to update" or desire == "update") and int(save_data["update_unit_id"]) == unit[0]:
                 save_data["update unit id"] = unit[0]
                 save_data["update unit"] = result
                 continue
@@ -353,45 +426,8 @@ GROUP BY id""")
             all_units.append((unit[0], result))
     
     if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
+        save_data = empty_save_data
         return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
-
-    if form_action == "selecting unit to update":  # user selected a unit to update, commence fill in code
-        unit_id = int(save_data["update_unit_id"])
-        unit_info = sql_statement(f"""
-SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, fid, code, unit_name, role_name FROM
-Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
-JOIN Roles ON Roles.role_id = Unit_Roles.rid
-JOIN Factions ON fid = faction_id
-WHERE id = {unit_id}
-GROUP BY id
-ORDER BY faction_name, tech_level""")
-        unit_info = unit_info[0]
-        save_data["unit_name"] = unit_info[1]
-        save_data["unit_health"] = unit_info[2]
-        save_data["unit_mass_cost"] = unit_info[3]
-        save_data["unit_energy_cost"] = unit_info[4]
-        save_data["unit_build_time"] = unit_info[5]
-        save_data["unit_tech_level"] = unit_info[6]
-        save_data["unit_faction_name"] = unit_info[7]
-        save_data["unit_faction_id"] = unit_info[8]
-        save_data["unit_code"] = unit_info[9]
-        save_data["unit_unit_name"] = unit_info[10]
-    
-        for role_entry in unit_info:
-            print(role_entry[11])
-            #save_data[role_entry[11]] = role_entry
-    
-    if form_action == "submit form" and desire == "add":  # user submitted a unit to add
-        nt = validate_unit(save_data)
-
-        has_error = False
-        for error in nt.values():  # checks for complaints
-            if error != None:  # complaint detected
-                has_error = True
-                break
-        if not has_error:  # no errors found with unit
-            save_data = empty_save_data
-            # add unit to supreme database
 
 
     # bullet proofing:

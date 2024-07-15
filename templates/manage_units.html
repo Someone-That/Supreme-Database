@@ -19,7 +19,7 @@
 
     {% if desire == "delete" %}
 
-    {% if nt['successful termination'] %}<label class="notification-text">{{nt['successful termination']}}</label>{% endif %}
+    {% if nt['successful termination'] %}<label class="notification-text">{{nt['successful termination']}}</label><br>{% endif %}
     <label>Select the unit you would like to delete:</label>
     <select class="s2" name="delete_unit_id" style="width: 20%" onchange="submitAction('selecting unit to delete')">
         {% if save_data['delete unit'] %}
@@ -95,19 +95,31 @@
 
     <label>Unit tech level:</label> {% if nt['unit_tech_level'] %}<label class="notification-text"> {{nt['unit_tech_level']}}</label>{% endif %}
     <select name="unit_tech_level">
+        {% if save_data['unit_tech_levels'] %}
+        {% for tech_level in save_data['unit_tech_levels'] %}
+        <option value="{{tech_level[0]}}">{{tech_level[1]}}</option>
+        {% endfor %}
+        {% else %}
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">Experimental</option>
+        {% endif %}
     </select>
     <br><br>
     
     <label>Unit faction:</label> {% if nt['unit_faction'] %}<label class="notification-text"> {{nt['unit_faction']}}</label>{% endif %}
     <select name="unit_faction">
+        {% if save_data['unit_factions'] %}
+        {% for faction in save_data['unit_factions'] %}
+        <option value="{{faction[0]}}">{{faction[1]}}</option>
+        {% endfor %}
+        {% else %}
         <option value="4">UEF</option>
         <option value="3">Aeon</option>
         <option value="2">Cybran</option>
         <option value="1">Seraphim</option>
+        {% endif %}
     </select>
     <br><br>
 
