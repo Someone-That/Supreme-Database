@@ -7,7 +7,7 @@ DATABASE_FILE = "supreme_db.db"
 tech_filter = []
 faction_filter = []
 role_filter = []
-all_roles = ["Land", "Air", "Navy", "Anti Air", "Anti Naval"]
+all_roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 all_tech_levels = [(1,1),(2,2),(3,3),(4,"Experimental")]
 all_factions = [(4,"UEF"),(3,"Aeon"),(2,"Cybran"),(1,"Seraphim")]
 
@@ -134,9 +134,13 @@ GROUP BY id""")
     return result
 
 
-def validate_stat(min, max, type, stat):  # there are 4 types: text, number, personal name
+def validate_stat(min, max, type, stat):  # there are 4 types: text, number, personal name, and code
+    if type == "code":
+        if sql_statement(f"SELECT name FROM Units WHERE code = '{stat}'"):  # unit code is taken
+            return "Unit's code already exists, choose another"
+
     if type == "personal name":
-        if sql_statement(f"SELECT name FROM Units WHERE unit_name = {stat}"):  # personal name is taken
+        if sql_statement(f"SELECT name FROM Units WHERE unit_name = '{stat}'"):  # personal name is taken
             return "Unit's personal name already exists, choose another."
 
     if type == "number":
@@ -183,7 +187,7 @@ def validate_unit(save_data):
     nt["unit_mass_cost"] = validate_stat(1, 7, "number", save_data["unit_mass_cost"])
     nt["unit_energy_cost"] = validate_stat(1, 7, "number", save_data["unit_energy_cost"])
     nt["unit_build_time"] = validate_stat(1, 7, "number", save_data["unit_build_time"])
-    nt["unit_code"] = validate_stat(7, 7, "text", save_data["unit_code"])
+    nt["unit_code"] = validate_stat(7, 7, "code", save_data["unit_code"])
     nt["unit_unit_name"] = validate_stat(2, 25, "personal name", save_data["unit_unit_name"])
 
     has_role = False
@@ -220,7 +224,7 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save
 
     #  insert unit roles
     unit_roles = []
-    roles = ["Land", "Air", "Navy", "Anti Air", "Anti Naval"]
+    roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
     for role in roles:
         if role in sd:
             unit_roles.append(role)
@@ -336,7 +340,10 @@ def submitted_units():
     }
     save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     save_data["submit desire value"] = response["submit desire"]
-    save_data = fill_in_tech_level_and_faction(save_data, int(save_data["unit_tech_level"]), int(save_data["unit_faction"]))
+    try:
+        save_data = fill_in_tech_level_and_faction(save_data, int(save_data["unit_tech_level"]), int(save_data["unit_faction"]))
+    except:
+        pass
     empty_save_data = {}
     empty_save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     empty_save_data["submit desire value"] = response["submit desire"]
@@ -415,7 +422,7 @@ GROUP BY id""")
                 result = f"{unit[1]}: {result}"
             result = f"{unit[0]}. {result}"
 
-            if (form_action == "selecting unit to update" or desire == "update") and int(save_data["update_unit_id"]) == unit[0]:
+            if desire == "update" and "update_unit_id" in save_data and int(save_data["update_unit_id"]) == unit[0]:
                 save_data["update unit id"] = unit[0]
                 save_data["update unit"] = result
                 continue
