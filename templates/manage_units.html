@@ -55,6 +55,8 @@
 
     {% endif %}
 
+    {% if desire == "add" or (desire == "update" and save_data['update unit']) %}
+
     {% if nt['successful update'] %}<label class="success-text">{{nt['successful update']}}</label><br><br>{% endif %}
     {% if nt['successful add'] %}<label class="success-text">{{nt['successful add']}}</label><br><br>{% endif %}
 
@@ -139,6 +141,7 @@
     <br><br>
 
     <input type="submit" value="Submit">
+    {% endif %}
     {% endif %}
 </form>
 
