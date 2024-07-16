@@ -134,14 +134,19 @@ GROUP BY id""")
     return result
 
 
-def validate_stat(min, max, type, stat):  # there are 4 types: text, number, personal name, and code
+def validate_stat(min, max, type, stat, unit_id = -1):  # there are 4 types: text, number, personal name, and code
+    '''function that checks if the stat is within the length contraints/is unique (if needed)'''
     if type == "code":
-        if sql_statement(f"SELECT name FROM Units WHERE code = '{stat}'"):  # unit code is taken
-            return "Unit's code already exists, choose another"
+        suspicious_ids = sql_statement(f"SELECT id FROM Units WHERE code = '{stat}'")
+        for id in suspicious_ids:
+            if id[0] != unit_id:  # unit code is taken
+                return "Unit's code already exists, choose another"
 
     if type == "personal name":
-        if sql_statement(f"SELECT name FROM Units WHERE unit_name = '{stat}'"):  # personal name is taken
-            return "Unit's personal name already exists, choose another."
+        suspicious_ids = sql_statement(f"SELECT id FROM Units WHERE unit_name = '{stat}'")
+        for id in suspicious_ids:
+            if id[0] != unit_id:  # personal name is taken
+                return "Unit's personal name already exists, choose another."
 
     if type == "number":
         try:
@@ -181,14 +186,24 @@ def fill_in_tech_level_and_faction(save_data, unit_tech_level, unit_faction):
 
 
 def validate_unit(save_data):
+    '''runs the validate_stat() function on all the unit stats and makes sure user inputted roles'''
+
     nt = {}
+    if "update_unit_id" in save_data:
+        if save_data["update_unit_id"] == "":
+            nt["update_unit_id"] = "No unit selected to update."
+            return nt
+        else:
+            unit_id = int(save_data["update_unit_id"])
+    else:
+        unit_id = -1
     nt["unit_name"] = validate_stat(2, 25, "text", save_data["unit_name"])
     nt["unit_health"] = validate_stat(1, 7, "number", save_data["unit_health"])
     nt["unit_mass_cost"] = validate_stat(1, 7, "number", save_data["unit_mass_cost"])
     nt["unit_energy_cost"] = validate_stat(1, 7, "number", save_data["unit_energy_cost"])
     nt["unit_build_time"] = validate_stat(1, 7, "number", save_data["unit_build_time"])
-    nt["unit_code"] = validate_stat(7, 7, "code", save_data["unit_code"])
-    nt["unit_unit_name"] = validate_stat(2, 25, "personal name", save_data["unit_unit_name"])
+    nt["unit_code"] = validate_stat(7, 7, "code", save_data["unit_code"], unit_id)
+    nt["unit_unit_name"] = validate_stat(2, 25, "personal name", save_data["unit_unit_name"], unit_id)
 
     has_role = False
     for role in all_roles:
@@ -236,6 +251,8 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save
 
         #  insert unit into role
         sql_statement(f"INSERT INTO Unit_Roles VALUES ({unit_id}, {role_id});")
+    
+    return unit_id
 
 
 @app.route('/')
@@ -396,14 +413,14 @@ ORDER BY faction_name, tech_level""")
                 has_error = True
                 break
         if not has_error and desire == "add":  # no errors found with unit and desire == add
-            add_unit_to_supreme_database(save_data)
+            nt["successful add"] = f"{construct_unit_title(add_unit_to_supreme_database(save_data))} has been successfully added."
             save_data = empty_save_data
         
         elif not has_error and desire == "update":  # no errors found with unit and desire == update
             update_unit_id = int(save_data['update_unit_id'])
-            nt["successful update"] = f"{construct_unit_title(update_unit_id)} has been successfully updated."
             delete_unit_from_supreme_database(update_unit_id)
             add_unit_to_supreme_database(save_data, update_unit_id)
+            nt["successful update"] = f"{construct_unit_title(update_unit_id)} has been successfully updated."
             save_data = empty_save_data
     
     if desire == "delete" or desire == "update":  # user selected they would like to delete or update a unit
@@ -422,7 +439,7 @@ GROUP BY id""")
                 result = f"{unit[1]}: {result}"
             result = f"{unit[0]}. {result}"
 
-            if desire == "update" and "update_unit_id" in save_data and int(save_data["update_unit_id"]) == unit[0]:
+            if desire == "update" and "update_unit_id" in save_data and save_data["update_unit_id"] != "" and int(save_data["update_unit_id"]) == unit[0]:
                 save_data["update unit id"] = unit[0]
                 save_data["update unit"] = result
                 continue
@@ -435,13 +452,6 @@ GROUP BY id""")
     if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
         save_data = empty_save_data
         return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
-
-
-    # bullet proofing:
-
-    # unit_name = response["unit_name"]
-    # if len(unit_name) < 2 or len(unit_name) > 25:
-    #     nt["unit_name"] = "Keep length between 2-25 characters."
 
     return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
 

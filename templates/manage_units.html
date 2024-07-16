@@ -19,7 +19,7 @@
 
     {% if desire == "delete" %}
 
-    {% if nt['successful termination'] %}<label class="notification-text">{{nt['successful termination']}}</label><br><br>{% endif %}
+    {% if nt['successful termination'] %}<label class="success-text">{{nt['successful termination']}}</label><br><br>{% endif %}
     <label>Select the unit you would like to delete:</label>
     <select class="s2" name="delete_unit_id" style="width: 20%" onchange="submitAction('selecting unit to delete')">
         {% if save_data['delete unit'] %}
@@ -38,6 +38,7 @@
     {% elif desire %}
 
     {% if desire == "update" %}
+
     <label>Select the unit you would like to update:</label>
     <select class="s2" name="update_unit_id" style="width: 20%" onchange="submitAction('selecting unit to update')">
         {% if save_data['update unit'] %}
@@ -49,9 +50,13 @@
         <option value="{{unit[0]}}">{{unit[1]}}</option>
         {% endfor %}
     </select>
+    {% if nt['update_unit_id'] %}<label class="notification-text"> {{nt['update_unit_id']}}</label>{% endif %}
     <br><br>
 
     {% endif %}
+
+    {% if nt['successful update'] %}<label class="success-text">{{nt['successful update']}}</label><br><br>{% endif %}
+    {% if nt['successful add'] %}<label class="success-text">{{nt['successful add']}}</label><br><br>{% endif %}
 
     <label>Unit name:</label>
     <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_name']}}">

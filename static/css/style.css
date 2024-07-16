@@ -26,6 +26,11 @@ header
     color: red;
 }
 
+.success-text
+{
+    color: rgb(159, 255, 127);
+}
+
 .mub 
 {
     margin-left: 35px;
