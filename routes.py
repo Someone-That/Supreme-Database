@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
+import os
 
 
 app = Flask(__name__)
@@ -326,7 +327,7 @@ def filter_pressed(faction):
 @app.route('/unit/<int:id>')
 def unit(id):
     unit_info = sql_statement(f"""
-SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name FROM
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, code FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -334,7 +335,13 @@ WHERE id = {id}
 GROUP BY id
 ORDER BY faction_name, tech_level""")
     # unit_info[0] = id, [1] = name, [2-7] = health, mass cost, energy cost, build time, tech level, faction
-    return render_template("unit.html", unit_id=id, unit=unit_info[0])
+    unit_code = unit_info[0][8]
+    icon_path = f"static/icons/units/{unit_code}.png"
+    if os.path.exists(icon_path):
+        icon_path = f"../../{icon_path}"
+    else:
+        icon_path = False
+    return render_template("unit.html", unit_id=id, unit=unit_info[0], icon_path=icon_path)
 
 
 @app.route('/manage-units')
