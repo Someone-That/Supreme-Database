@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, redirect
+from werkzeug.utils import secure_filename
 import sqlite3
 import os
 
 
 app = Flask(__name__)
 DATABASE_FILE = "supreme_db.db"
+icon_folder_path = "static/icons/units/"
+temp_folder_path = "static/temp/"
 tech_filter = []
 faction_filter = []
 role_filter = []
@@ -256,6 +259,20 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save
     return unit_id
 
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in 'png'
+
+
+def construct_icon_path(unit_code):
+    '''uses unit code to construct icon path'''
+    icon_path = f"{icon_folder_path}{unit_code}.png"
+    if os.path.exists(icon_path):
+        return icon_path
+    else:
+        return False
+
+
 @app.route('/')
 def home():
     extraction = sql_statement(f"""
@@ -336,11 +353,9 @@ GROUP BY id
 ORDER BY faction_name, tech_level""")
     # unit_info[0] = id, [1] = name, [2-7] = health, mass cost, energy cost, build time, tech level, faction
     unit_code = unit_info[0][8]
-    icon_path = f"static/icons/units/{unit_code}.png"
-    if os.path.exists(icon_path):
+    icon_path = construct_icon_path(unit_code)
+    if icon_path:
         icon_path = f"../../{icon_path}"
-    else:
-        icon_path = False
     return render_template("unit.html", unit_id=id, unit=unit_info[0], icon_path=icon_path)
 
 
@@ -410,6 +425,8 @@ ORDER BY faction_name, tech_level""")
     
         for role_entry in unit_extraction:
             save_data[role_entry[11]] = role_entry[11]
+        
+        save_data["icon_path"] = construct_icon_path(save_data['unit_code'])
     
     if form_action == "submit form" and (desire == "add" or desire == "update"):  # user submitted a unit to add or update
         nt = validate_unit(save_data)
@@ -455,6 +472,23 @@ GROUP BY id""")
                 save_data["delete unit"] = result
                 continue
             all_units.append((unit[0], result))
+    
+    if form_action == "uploading icon":  # user uploaded an icon
+        icon = request.files['icon']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if icon.filename == '':
+            nt['icon'] = "No file selected."
+        if icon and allowed_file(icon.filename):
+            filename = secure_filename(icon.filename)
+            for garbage in os.listdir(temp_folder_path):
+                os.remove(os.path.join(temp_folder_path, garbage))
+            icon_path = os.path.join(temp_folder_path, filename)
+            icon.save(icon_path)
+            save_data["icon_path"] = icon_path
+        else:
+            nt['icon'] = "Only png's allowed."
+
     
     if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
         save_data = empty_save_data

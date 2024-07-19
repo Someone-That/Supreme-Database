@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<form id="manage units form" method="post">
+<form id="manage units form" method="post" enctype="multipart/form-data">
     <label>What would you like to do?</label>
     <select id="submit desire" name="submit desire" onchange="submitAction('submitting desire')">
         {% if save_data['submit desire value'] %}
@@ -139,6 +139,11 @@
     <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_unit_name']}}">
     {% if nt['unit_unit_name'] %}<label class="notification-text"> {{nt['unit_unit_name']}}</label>{% endif %}
     <br><br>
+
+    <label for="icon">Unit icon (png's only): </label>
+    <input type="file" accept="image/*" name="icon" value="Unit Icon" onchange="submitAction('uploading icon')">
+    {% if nt['icon'] %}<label class="notification-text"> {{nt['icon']}}</label>{% endif %}<br><br>
+    {% if save_data["icon_path"] %}<img src="{{save_data['icon_path']}}"><br>{% endif %}
 
     <input type="submit" value="Submit">
     {% endif %}
