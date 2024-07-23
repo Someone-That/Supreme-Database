@@ -147,6 +147,8 @@ def validate_stat(min, max, type, stat, unit_id = -1):  # there are 4 types: tex
                 return "Unit's code already exists, choose another"
 
     if type == "personal name":
+        if not stat:
+            return
         suspicious_ids = sql_statement(f"SELECT id FROM Units WHERE unit_name = '{stat}'")
         for id in suspicious_ids:
             if id[0] != unit_id:  # personal name is taken
