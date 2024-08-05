@@ -140,10 +140,17 @@
     {% if nt['unit_unit_name'] %}<label class="notification-text"> {{nt['unit_unit_name']}}</label>{% endif %}
     <br><br>
 
-    <label for="icon">Unit icon (png's only): </label>
-    <input type="file" accept="image/*" name="icon" value="Unit Icon" onchange="submitAction('uploading icon')">
+    <label for="icon" class="icon_button">Unit icon (png's only)</label>
+    <input type="file" accept="image/*" id="icon" name="icon" value="Unit Icon" onchange="submitAction('uploading icon')" style="display:none">
     {% if nt['icon'] %}<label class="notification-text"> {{nt['icon']}}</label>{% endif %}<br><br>
-    {% if save_data["icon_path"] %}<img src="{{save_data['icon_path']}}"><br>{% endif %}
+
+    {% if save_data["icon_path"] and not save_data["override_icon_path"] %}
+    <input type="hidden" name="icon_path" value="{{save_data['icon_path']}}">
+    <img src="{{save_data['icon_path']}}"><br>{% endif %}
+
+    {% if save_data["override_icon_path"] %}
+    <input type="hidden" name="override_icon_path" value="{{save_data['override_icon_path']}}">
+    <img src="{{save_data['override_icon_path']}}"><br>{% endif %}
 
     <input type="submit" value="Submit">
     {% endif %}

@@ -21,6 +21,13 @@ header
     padding: 0px 5%;
 }
 
+.icon_button
+{
+    background-color: gray;
+    border: white;
+    padding: 2px;
+}
+
 .notification-text
 {
     color: red;

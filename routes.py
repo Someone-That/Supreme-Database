@@ -381,6 +381,7 @@ def submitted_units():
     }
     save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     save_data["submit desire value"] = response["submit desire"]
+    
     try:
         save_data = fill_in_tech_level_and_faction(save_data, int(save_data["unit_tech_level"]), int(save_data["unit_faction"]))
     except:
@@ -483,11 +484,13 @@ GROUP BY id""")
             nt['icon'] = "No file selected."
         if icon and allowed_file(icon.filename):
             filename = secure_filename(icon.filename)
-            for garbage in os.listdir(temp_folder_path):
+            for garbage in os.listdir(temp_folder_path):  # cleans out temp folder
+                if garbage == "dummy file for github.txt":  # dealing with github's annoying ignorance of empty folders
+                    continue
                 os.remove(os.path.join(temp_folder_path, garbage))
             icon_path = os.path.join(temp_folder_path, filename)
             icon.save(icon_path)
-            save_data["icon_path"] = icon_path
+            save_data["override_icon_path"] = icon_path
         else:
             nt['icon'] = "Only png's allowed."
 
