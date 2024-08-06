@@ -12,8 +12,8 @@ tech_filter = []
 faction_filter = []
 role_filter = []
 all_roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
-all_tech_levels = [(1,1),(2,2),(3,3),(4,"Experimental")]
-all_factions = [(4,"UEF"),(3,"Aeon"),(2,"Cybran"),(1,"Seraphim")]
+all_tech_levels = [(1, 1), (2, 2), (3, 3), (4, "Experimental")]
+all_factions = [(4, "UEF"), (3, "Aeon"), (2, "Cybran"), (1, "Seraphim")]
 
 
 button_order = ['1', '2', '3', '4', "UEF", "Aeon", "Cybran", "Seraphim", "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
@@ -32,7 +32,8 @@ def sql_statement(sql):
 
 
 def clean_up_data(data):
-    '''this function converts all tuples with only a single item in a list into non tuples, this removes the need to type something like ids[0][0]'''
+    '''this function converts all tuples with only a single item in a list
+    into non tuples, this removes the need to type something like ids[0][0]'''
     clean_data = []
     for i in data:
         clean_data.append(i[0])
@@ -69,7 +70,8 @@ def process_filter_button_pressed(data):
         else:
             role_filter.append(data[1:])
 
-    # tracks which button was pressed so the site can know which css toggle state to use for that button
+    # tracks which button was pressed so the site can know which
+    # css toggle state to use for that button
     all_filters = tech_filter + faction_filter + role_filter
     data = data[1:]
     if data in all_filters:  # filter is selected
@@ -79,7 +81,8 @@ def process_filter_button_pressed(data):
 
 
 def construct_filter_statement(faction_site=""):
-    '''uses filter lists to construct an sql WHERE statement which will contain all filters selected'''
+    '''uses filter lists to construct an sql WHERE statement
+    which will contain all filters selected'''
     tf = ""
     for i in range(len(tech_filter)):
         tf = tf + f"tech_level = {tech_filter[i]}"
@@ -128,18 +131,22 @@ WHERE id = {unit_id}
 GROUP BY id""")
     unit = unit[0]
     # put units in digestable form for website output
-    if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
+    if unit[2] == 4 or unit[2] == 0:
+        # unit is experimental or doesn't have a tech level
         result = f"{unit[3]}"
     else:
-        result = f"T{unit[2]} {unit[3]}"  # example output: T1 Engineer [UAL0105]
+        result = f"T{unit[2]} {unit[3]}"
+        # example output: T1 Engineer [UAL0105]
     if unit[1]:  # unit has a name
         result = f"{unit[1]}: {result}"
     result = f"{unit[0]}. {result}"
     return result
 
 
-def validate_stat(min, max, type, stat, unit_id = -1):  # there are 4 types: text, number, personal name, and code
-    '''function that checks if the stat is within the length contraints/is unique (if needed)'''
+def validate_stat(min, max, type, stat, unit_id=-1):
+    # there are 4 types: text, number, personal name, and code
+    '''function that checks if the stat is within the length
+    contraints/is unique (if needed)'''
     if type == "code":
         suspicious_ids = sql_statement(f"SELECT id FROM Units WHERE code = '{stat}'")
         for id in suspicious_ids:
@@ -161,7 +168,7 @@ def validate_stat(min, max, type, stat, unit_id = -1):  # there are 4 types: tex
             return "Number input needed."
 
     stat_length = len(stat)
-    
+
     if stat_length == 0:
         return "Missing input."
     if stat_length < min:
@@ -177,7 +184,7 @@ def fill_in_tech_level_and_faction(save_data, unit_tech_level, unit_faction):
         save_data.pop("unit_tech_levels")
     if "unit_factions" in save_data:
         save_data.pop("unit_factions")
-    
+
     unit_tech_levels = list(all_tech_levels)
     unit_tech_levels.insert(0, unit_tech_levels.pop(unit_tech_level-1))
     save_data["unit_tech_levels"] = unit_tech_levels
@@ -192,7 +199,8 @@ def fill_in_tech_level_and_faction(save_data, unit_tech_level, unit_faction):
 
 
 def validate_unit(save_data):
-    '''runs the validate_stat() function on all the unit stats and makes sure user inputted roles'''
+    '''runs the validate_stat() function on all the unit
+    stats and makes sure user inputted roles'''
 
     nt = {}
     if "update_unit_id" in save_data:
@@ -218,7 +226,7 @@ def validate_unit(save_data):
             break
     if not has_role:
         nt["unit_roles"] = "Missing input."
-    
+
     return nt
 
 
@@ -227,7 +235,8 @@ def delete_unit_from_supreme_database(unit_id):
     sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {unit_id};")
 
 
-def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save_data
+def add_unit_to_supreme_database(sd, do_not_create_new_id=False):
+    # sd = save_data
     # assign unit id
     if do_not_create_new_id:
         unit_id = do_not_create_new_id
@@ -240,10 +249,10 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save
         highest_id += 1
         unit_id = highest_id
 
-    #  insert unit data
+    # insert unit data
     sql_statement(f"INSERT INTO Units VALUES ({unit_id}, '{sd['unit_name']}', {sd['unit_health']}, {sd['unit_mass_cost']}, {sd['unit_energy_cost']}, {sd['unit_build_time']}, {sd['unit_tech_level']}, {sd['unit_faction']}, '{sd['unit_code']}', '{sd['unit_unit_name']}');")
 
-    #  insert unit roles
+    # insert unit roles
     unit_roles = []
     roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
     for role in roles:
@@ -251,13 +260,21 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id = False):  # sd = save
             unit_roles.append(role)
 
     for role in unit_roles:
-        #  get role id
+        # get role id
         results = sql_statement(f"SELECT role_id FROM Roles WHERE role_name = '{role}'")
         role_id = results[0][0]
 
-        #  insert unit into role
+        # insert unit into role
         sql_statement(f"INSERT INTO Unit_Roles VALUES ({unit_id}, {role_id});")
-    
+
+    # insert unit icon
+    if "override_icon_path" in sd:
+        try:
+            os.remove(f"{icon_folder_path}{sd['unit_code']}.png")
+        except FileNotFoundError:
+            pass
+        os.rename(sd["override_icon_path"], f"{icon_folder_path}{sd['unit_code']}.png")
+
     return unit_id
 
 
@@ -287,10 +304,12 @@ GROUP BY id
 ORDER BY id""")
     all_units = []
     for unit in extraction:  # put units in digestable form for website output
-        if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
+        if unit[2] == 4 or unit[2] == 0:
+            # unit is experimental or doesn't have a tech level
             result = f"{unit[3]} [{unit[4]}]"
         else:
-            result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
+            result = f"T{unit[2]} {unit[3]} [{unit[4]}]"
+            # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
@@ -321,11 +340,14 @@ JOIN Factions ON fid = faction_id
 GROUP BY id
 ORDER BY faction_name, tech_level""")
     all_units = []
-    for unit in faction_extract:  # put units in digestible form for website output
-        if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
+    for unit in faction_extract:
+        # put units in digestible form for website output
+        if unit[2] == 4 or unit[2] == 0:
+            # unit is experimental or doesn't have a tech level
             result = f"{unit[3]} [{unit[4]}]"
         else:
-            result = f"T{unit[2]} {unit[3]} [{unit[4]}]"  # example output: T1 Engineer [UAL0105]
+            result = f"T{unit[2]} {unit[3]} [{unit[4]}]"
+            # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
@@ -333,7 +355,8 @@ ORDER BY faction_name, tech_level""")
     return render_template("faction.html", units=all_units, faction_site=faction, button_toggles=convert_button_toggles_to_css_class())
 
 
-@app.route('/faction/<string:faction>', methods=['POST'])  # user pressed filter button on faction page
+@app.route('/faction/<string:faction>', methods=['POST'])
+# user pressed filter button on faction page
 def filter_pressed(faction):
     data = list(request.form)
     data = data[0]
@@ -346,14 +369,16 @@ def filter_pressed(faction):
 @app.route('/unit/<int:id>')
 def unit(id):
     unit_info = sql_statement(f"""
-SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, code FROM
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level,
+faction_name, code FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
 WHERE id = {id}
 GROUP BY id
 ORDER BY faction_name, tech_level""")
-    # unit_info[0] = id, [1] = name, [2-7] = health, mass cost, energy cost, build time, tech level, faction
+    # unit_info[0] = id, [1] = name, [2-7] = health,
+    # mass cost, energy cost, build time, tech level, faction
     unit_code = unit_info[0][8]
     icon_path = construct_icon_path(unit_code)
     if icon_path:
@@ -375,13 +400,13 @@ def submitted_units():
     save_data = dict(response)
 
     value_vs_display = {
-    "add": "Add a unit",
-    "update": "Update a unit",
-    "delete": "Delete a unit",
+        "add": "Add a unit",
+        "update": "Update a unit",
+        "delete": "Delete a unit",
     }
     save_data["submit desire display"] = value_vs_display[response["submit desire"]]
     save_data["submit desire value"] = response["submit desire"]
-    
+
     try:
         save_data = fill_in_tech_level_and_faction(save_data, int(save_data["unit_tech_level"]), int(save_data["unit_faction"]))
     except:
@@ -395,15 +420,18 @@ def submitted_units():
     form_action = response["form_action"]
     desire = response["submit desire"]
 
-    if form_action == "submit form" and desire == "delete":  # user submitted a unit for deletion
+    if form_action == "submit form" and desire == "delete":
+        # user submitted a unit for deletion
         delete_unit_id = int(save_data['delete_unit_id'])
         nt["successful termination"] = f"{construct_unit_title(delete_unit_id)} has been successfully terminated. 🤗"
         delete_unit_from_supreme_database(delete_unit_id)
 
-    if form_action == "selecting unit to update":  # user selected a unit to update, commence fill in code
+    if form_action == "selecting unit to update":
+        # user selected a unit to update, commence fill in code
         unit_id = int(save_data["update_unit_id"])
         unit_extraction = sql_statement(f"""
-SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level, faction_name, fid, code, unit_name, role_name FROM
+SELECT id, name, health, mass_cost, energy_cost, build_time, tech_level,
+faction_name, fid, code, unit_name, role_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -425,43 +453,50 @@ ORDER BY faction_name, tech_level""")
         for role in all_roles:
             if role in save_data:
                 save_data.pop(role)
-    
+
         for role_entry in unit_extraction:
             save_data[role_entry[11]] = role_entry[11]
-        
+
         save_data["icon_path"] = construct_icon_path(save_data['unit_code'])
-    
-    if form_action == "submit form" and (desire == "add" or desire == "update"):  # user submitted a unit to add or update
+
+    if form_action == "submit form" and (desire == "add" or desire == "update"):
+        # user submitted a unit to add or update
         nt = validate_unit(save_data)
 
         has_error = False
         for error in nt.values():  # checks for complaints
-            if error != None:  # complaint detected
+            if error is not None:  # complaint detected
                 has_error = True
                 break
-        if not has_error and desire == "add":  # no errors found with unit and desire == add
+        if not has_error and desire == "add":
+            # no errors found with unit and desire == add
             nt["successful add"] = f"{construct_unit_title(add_unit_to_supreme_database(save_data))} has been successfully added."
             save_data = empty_save_data
-        
-        elif not has_error and desire == "update":  # no errors found with unit and desire == update
+
+        elif not has_error and desire == "update":
+            # no errors found with unit and desire == update
             update_unit_id = int(save_data['update_unit_id'])
             delete_unit_from_supreme_database(update_unit_id)
             add_unit_to_supreme_database(save_data, update_unit_id)
             nt["successful update"] = f"{construct_unit_title(update_unit_id)} has been successfully updated."
             save_data = empty_save_data
-    
-    if desire == "delete" or desire == "update":  # user selected they would like to delete or update a unit
+
+    if desire == "delete" or desire == "update":
+        # user selected they would like to delete or update a unit
         extraction = sql_statement("""
 SELECT id, unit_name, tech_level, name, code FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
 GROUP BY id""")
-        for unit in extraction:  # put units in digestable form for website output
-            if unit[2] == 4 or unit[2] == 0:  # unit is experimental or doesn't have a tech level
+        for unit in extraction:
+            # put units in digestable form for website output
+            if unit[2] == 4 or unit[2] == 0:
+                # unit is experimental or doesn't have a tech level
                 result = f"{unit[3]}"
             else:
-                result = f"T{unit[2]} {unit[3]}"  # example output: T1 Engineer [UAL0105]
+                result = f"T{unit[2]} {unit[3]}"
+                # example output: T1 Engineer [UAL0105]
             if unit[1]:  # unit has a name
                 result = f"{unit[1]}: {result}"
             result = f"{unit[0]}. {result}"
@@ -475,7 +510,7 @@ GROUP BY id""")
                 save_data["delete unit"] = result
                 continue
             all_units.append((unit[0], result))
-    
+
     if form_action == "uploading icon":  # user uploaded an icon
         icon = request.files['icon']
         # if user does not select file, browser also
@@ -484,8 +519,10 @@ GROUP BY id""")
             nt['icon'] = "No file selected."
         if icon and allowed_file(icon.filename):
             filename = secure_filename(icon.filename)
-            for garbage in os.listdir(temp_folder_path):  # cleans out temp folder
-                if garbage == "dummy file for github.txt":  # dealing with github's annoying ignorance of empty folders
+            for garbage in os.listdir(temp_folder_path):
+                # cleans out temp folder
+                if garbage == "dummy file for github.txt":
+                    # dealing with github's annoying ignorance of empty folders
                     continue
                 os.remove(os.path.join(temp_folder_path, garbage))
             icon_path = os.path.join(temp_folder_path, filename)
@@ -494,8 +531,8 @@ GROUP BY id""")
         else:
             nt['icon'] = "Only png's allowed."
 
-    
-    if form_action == "submitting desire":  # user submitted what they wanted to do rather than submitting a form
+    if form_action == "submitting desire":
+        # user submitted what they wanted to do rather than submitting a form
         save_data = empty_save_data
         return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
 
