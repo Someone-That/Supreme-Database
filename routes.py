@@ -31,15 +31,6 @@ def sql_statement(sql):
         return
 
 
-def clean_up_data(data):
-    '''this function converts all tuples with only a single item in a list
-    into non tuples, this removes the need to type something like ids[0][0]'''
-    clean_data = []
-    for i in data:
-        clean_data.append(i[0])
-    return clean_data
-
-
 def convert_button_toggles_to_css_class():
     return_output = []
     for toggle in button_toggles:
@@ -315,7 +306,9 @@ ORDER BY id""")
 
         all_units.append((unit[0], result, unit[5].lower()))
 
-    return render_template("home.html", units=all_units, button_toggles=convert_button_toggles_to_css_class())
+    return render_template(
+        "home.html", units=all_units,
+        button_toggles=convert_button_toggles_to_css_class())
 
 
 @app.route('/', methods=['POST'])  # user pressed filter button on homepage
@@ -352,7 +345,9 @@ ORDER BY faction_name, tech_level""")
             result = f"{unit[1]}: {result}"
 
         all_units.append((unit[0], result, unit[5].lower()))
-    return render_template("faction.html", units=all_units, faction_site=faction, button_toggles=convert_button_toggles_to_css_class())
+    return render_template(
+        "faction.html", units=all_units, faction_site=faction,
+        button_toggles=convert_button_toggles_to_css_class())
 
 
 @app.route('/faction/<string:faction>', methods=['POST'])
@@ -383,7 +378,9 @@ ORDER BY faction_name, tech_level""")
     icon_path = construct_icon_path(unit_code)
     if icon_path:
         icon_path = f"../../{icon_path}"
-    return render_template("unit.html", unit_id=id, unit=unit_info[0], icon_path=icon_path)
+    return render_template(
+        "unit.html", unit_id=id, unit=unit_info[0],
+        icon_path=icon_path)
 
 
 @app.route('/manage-units')
@@ -408,7 +405,9 @@ def submitted_units():
     save_data["submit desire value"] = response["submit desire"]
 
     try:
-        save_data = fill_in_tech_level_and_faction(save_data, int(save_data["unit_tech_level"]), int(save_data["unit_faction"]))
+        save_data = fill_in_tech_level_and_faction(
+            save_data, int(save_data["unit_tech_level"]),
+            int(save_data["unit_faction"]))
     except:
         pass
     empty_save_data = {}
@@ -448,7 +447,8 @@ ORDER BY faction_name, tech_level""")
         save_data["unit_code"] = unit_info[9]
         save_data["unit_unit_name"] = unit_info[10]
 
-        save_data = fill_in_tech_level_and_faction(save_data, unit_tech_level, unit_faction_id)
+        save_data = fill_in_tech_level_and_faction(
+            save_data, unit_tech_level, unit_faction_id)
 
         for role in all_roles:
             if role in save_data:
@@ -534,9 +534,13 @@ GROUP BY id""")
     if form_action == "submitting desire":
         # user submitted what they wanted to do rather than submitting a form
         save_data = empty_save_data
-        return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
+        return render_template(
+            "manage_units.html", desire=desire, units=all_units,
+            save_data=save_data, nt=nt)
 
-    return render_template("manage_units.html", desire=desire, units=all_units, save_data=save_data, nt=nt)
+    return render_template(
+        "manage_units.html", desire=desire, units=all_units,
+        save_data=save_data, nt=nt)
 
 
 @app.errorhandler(404)  # 404 page

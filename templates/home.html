@@ -18,8 +18,17 @@
 <h2 id="filter-tutorial">To filter units, simply toggle the filters you desire that are located under the navbar during unit viewing.</h2>
 
 <h2>All units:</h2>
+<div class="grid-container">
 {% for unit in units %} <!--loops through all the data neatly-->
-    <h2><a href="/unit/{{unit[0]}}" class="unit {{unit[2]}}_colour">{{unit[0]}}. {{unit[1]}}</a></h2> <!--displays id, name-->
+    <a href="/unit/{{unit[0]}}">
+    <div class="unit-card">
+        <img src="static/icons/units/DEA0202.png" style="width:100%">
+        <div class="unit-container">
+        <h4 class="unit {{unit[2]}}_colour"><b>{{unit[0]}}. {{unit[1]}}</b></h4>
+        </div>
+    </div>
+    </a>
 {%endfor%}
+</div>
 
 {% endblock %}
