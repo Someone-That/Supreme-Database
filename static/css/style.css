@@ -1,3 +1,11 @@
+:root 
+{
+    --uef: rgb(92, 178, 228);
+    --aeon: rgb(73, 185, 98);
+    --cybran: rgb(226, 114, 100);
+    --seraphim: rgb(250, 234, 110);
+}
+
 body
 {
     font-family: "Segoe UI", "Arial";
@@ -28,6 +36,12 @@ header
     transition: 0.3s;
     margin: 10px;
     overflow-wrap: break-word;
+    border: 1px solid #ffffff;
+}
+
+.unit-card-img
+{
+    border-bottom: 1px solid;
 }
   
 /* On mouse-over, add a deeper shadow */
@@ -39,16 +53,21 @@ header
 /* Add some padding inside the card container */
 .unit-container 
 {
-    padding: 2px 16px;
+    padding: 2px 5px;
+    margin: 0px;
+}
+
+h4
+{
+    padding: 0px;
+    margin-top: 0px;
+    margin-bottom: 4px;
 }
 
 .grid-container 
 {
-    border-radius: 20px;
-    border: 1px solid #ffffff;
-    border-width: 5px;
-    margin-left: 5%;
-    margin-right: 5%;
+    margin-left: 4%;
+    margin-right: 4%;
     display: grid;
     grid-template-columns: 10% 10% 10% 10% 10% 10% 10% 10% 10% 10%;
 }
@@ -182,29 +201,44 @@ header
     background-color: #FFFFFF;
 }
 
-.unit
-{
-    color: aquamarine;
-}
-
 .uef_colour
 {
-    color: rgb(92, 178, 228);
+    color: var(--uef);
 }
 
 .aeon_colour
 {
-    color: rgb(73, 185, 98);
+    color: var(--aeon);
 }
 
 .cybran_colour
 {
-    color: rgb(226, 114, 100);
+    color: var(--cybran);
 }
 
 .seraphim_colour
 {
-    color: rgb(250, 234, 110);
+    color: var(--seraphim);
+}
+
+.uef_border_colour
+{
+    border-color: var(--uef);
+}
+
+.aeon_border_colour
+{
+    border-color: var(--aeon);
+}
+
+.cybran_border_colour
+{
+    border-color: var(--cybran);
+}
+
+.seraphim_border_colour
+{
+    border-color: var(--seraphim);
 }
 
 .select2-results__option

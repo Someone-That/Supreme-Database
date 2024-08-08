@@ -19,12 +19,13 @@
 
 <h2>All units:</h2>
 <div class="grid-container">
-{% for unit in units %} <!--loops through all the data neatly-->
+<!--loops through all the data neatly-->
+{% for unit in units %}
     <a href="/unit/{{unit[0]}}">
-    <div class="unit-card">
-        <img src="static/icons/units/DEA0202.png" style="width:100%">
+    <div class="unit-card {{unit[2]}}_border_colour">
+        <img src="static/icons/units/{{unit[3]}}.png" style="width:100%" class="unit-card-img {{unit[2]}}_border_colour">
         <div class="unit-container">
-        <h4 class="unit {{unit[2]}}_colour"><b>{{unit[0]}}. {{unit[1]}}</b></h4>
+        <h4 class="{{unit[2]}}_colour">{{unit[0]}}. {{unit[1]}}</h4>
         </div>
     </div>
     </a>

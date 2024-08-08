@@ -143,7 +143,8 @@ def validate_stat(min, max, type, stat, unit_id=-1):
     '''function that checks if the stat is within the length
     contraints/is unique (if needed)'''
     if type == "code":
-        suspicious_ids = sql_statement(f"SELECT id FROM Units WHERE code = '{stat}'") # noqa
+        suspicious_ids = sql_statement(
+            f"SELECT id FROM Units WHERE code = '{stat}'")
         for id in suspicious_ids:
             if id[0] != unit_id:  # unit code is taken
                 return "Unit's code already exists, choose another"
@@ -151,7 +152,8 @@ def validate_stat(min, max, type, stat, unit_id=-1):
     if type == "personal name":
         if not stat:
             return
-        suspicious_ids = sql_statement(f"SELECT id FROM Units WHERE unit_name = '{stat}'") # noqa
+        suspicious_ids = sql_statement(
+            f"SELECT id FROM Units WHERE unit_name = '{stat}'")
         for id in suspicious_ids:
             if id[0] != unit_id:  # personal name is taken
                 return "Unit's personal name already exists, choose another."
@@ -208,11 +210,16 @@ def validate_unit(save_data):
         unit_id = -1
     nt["unit_name"] = validate_stat(2, 25, "text", save_data["unit_name"])
     nt["unit_health"] = validate_stat(1, 7, "number", save_data["unit_health"])
-    nt["unit_mass_cost"] = validate_stat(1, 7, "number", save_data["unit_mass_cost"]) # noqa
-    nt["unit_energy_cost"] = validate_stat(1, 7, "number", save_data["unit_energy_cost"]) # noqa
-    nt["unit_build_time"] = validate_stat(1, 7, "number", save_data["unit_build_time"]) # noqa
-    nt["unit_code"] = validate_stat(7, 7, "code", save_data["unit_code"], unit_id) # noqa
-    nt["unit_unit_name"] = validate_stat(2, 25, "personal name", save_data["unit_unit_name"], unit_id) # noqa
+    nt["unit_mass_cost"] = validate_stat(
+        1, 7, "number", save_data["unit_mass_cost"])
+    nt["unit_energy_cost"] = validate_stat(
+        1, 7, "number", save_data["unit_energy_cost"])
+    nt["unit_build_time"] = validate_stat(
+        1, 7, "number", save_data["unit_build_time"])
+    nt["unit_code"] = validate_stat(
+        7, 7, "code", save_data["unit_code"], unit_id)
+    nt["unit_unit_name"] = validate_stat(
+        2, 25, "personal name", save_data["unit_unit_name"], unit_id)
 
     has_role = False
     for role in all_roles:
@@ -260,7 +267,8 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id=False):
 
     for role in unit_roles:
         # get role id
-        results = sql_statement(f"SELECT role_id FROM Roles WHERE role_name = '{role}'") # noqa
+        results = sql_statement(
+            f"SELECT role_id FROM Roles WHERE role_name = '{role}'")
         role_id = results[0][0]
 
         # insert unit into role
@@ -272,7 +280,9 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id=False):
             os.remove(f"{icon_folder_path}{sd['unit_code']}.png")
         except FileNotFoundError:
             pass
-        os.rename(sd["override_icon_path"], f"{icon_folder_path}{sd['unit_code']}.png") # noqa
+        os.rename(
+            sd["override_icon_path"],
+            f"{icon_folder_path}{sd['unit_code']}.png")
 
     return unit_id
 
@@ -312,7 +322,7 @@ ORDER BY id""")
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
-        all_units.append((unit[0], result, unit[5].lower()))
+        all_units.append((unit[0], result, unit[5].lower(), unit[4]))
 
     return render_template(
         "home.html", units=all_units,
@@ -409,7 +419,8 @@ def submitted_units():
         "update": "Update a unit",
         "delete": "Delete a unit",
     }
-    save_data["submit desire display"] = value_vs_display[response["submit desire"]] # noqa
+    line_shortener = value_vs_display[response["submit desire"]]
+    save_data["submit desire display"] = line_shortener
     save_data["submit desire value"] = response["submit desire"]
 
     try:
@@ -419,7 +430,8 @@ def submitted_units():
     except: # noqa
         pass
     empty_save_data = {}
-    empty_save_data["submit desire display"] = value_vs_display[response["submit desire"]] # noqa
+    line_shortener = value_vs_display[response["submit desire"]]
+    empty_save_data["submit desire display"] = line_shortener
     empty_save_data["submit desire value"] = response["submit desire"]
 
     desire = ""
@@ -430,8 +442,9 @@ def submitted_units():
     if form_action == "submit form" and desire == "delete":
         # user submitted a unit for deletion
         delete_unit_id = int(save_data['delete_unit_id'])
-        success = f"{construct_unit_title(delete_unit_id)} has been successfully terminated. 🤗" # noqa
-        nt["successful termination"] = success
+        # success is line shortener
+        success = f"{construct_unit_title(delete_unit_id)} has been succes"
+        nt["successful termination"] = f"{success}sfully terminated. 🤗"
         delete_unit_from_supreme_database(delete_unit_id)
 
     if form_action == "selecting unit to update":
@@ -468,7 +481,8 @@ ORDER BY faction_name, tech_level""")
 
         save_data["icon_path"] = construct_icon_path(save_data['unit_code'])
 
-    if form_action == "submit form" and (desire == "add" or desire == "update"): # noqa
+    if form_action == "submit form" and \
+            (desire == "add" or desire == "update"):
         # user submitted a unit to add or update
         nt = validate_unit(save_data)
 
@@ -479,7 +493,8 @@ ORDER BY faction_name, tech_level""")
                 break
         if not has_error and desire == "add":
             # no errors found with unit and desire == add
-            success = construct_unit_title(add_unit_to_supreme_database(save_data)) # noqa
+            successful_add = add_unit_to_supreme_database(save_data)
+            success = construct_unit_title(successful_add)
             nt["successful add"] = f"{success} has been successfully added."
             save_data = empty_save_data
 
@@ -488,8 +503,8 @@ ORDER BY faction_name, tech_level""")
             update_unit_id = int(save_data['update_unit_id'])
             delete_unit_from_supreme_database(update_unit_id)
             add_unit_to_supreme_database(save_data, update_unit_id)
-            success = construct_unit_title(update_unit_id)
-            nt["successful update"] = f"{success} has been successfully updated." # noqa
+            success = f"{construct_unit_title(update_unit_id)} has been "
+            nt["successful update"] = f"{success}successfully updated."
             save_data = empty_save_data
 
     if desire == "delete" or desire == "update":
