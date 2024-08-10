@@ -303,6 +303,11 @@ def construct_icon_path(unit_code):
 
 @app.route('/')
 def home():
+    return render_template("home.html")
+
+
+@app.route('/all')
+def all_units():
     extraction = sql_statement(f"""
 SELECT id, unit_name, tech_level, name, code, faction_name FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
@@ -325,18 +330,18 @@ ORDER BY id""")
         all_units.append((unit[0], result, unit[5].lower(), unit[4]))
 
     return render_template(
-        "home.html", units=all_units,
+        "all_units.html", units=all_units,
         button_toggles=convert_button_toggles_to_css_class())
 
 
-@app.route('/', methods=['POST'])  # user pressed filter button on homepage
-def home_filter_pressed():
+@app.route('/all', methods=['POST'])  # user pressed filter button on homepage
+def all_units_filter_pressed():
     data = list(request.form)
     data = data[0]
 
     process_filter_button_pressed(data)
 
-    return redirect("/")
+    return redirect("/all")
 
 
 @app.route('/faction/<string:faction>')
@@ -362,7 +367,7 @@ ORDER BY faction_name, tech_level""")
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
-        all_units.append((unit[0], result, unit[5].lower()))
+        all_units.append((unit[0], result, unit[5].lower(), unit[4]))
     return render_template(
         "faction.html", units=all_units, faction_site=faction,
         button_toggles=convert_button_toggles_to_css_class())
