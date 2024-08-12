@@ -5,14 +5,31 @@
 <div class="grid-container">
 <!--loops through all the data neatly-->
 {% for unit in units %}
+<div class="flip-card">
+<div class="flip-card-inner">
+<div class="flip-card-back unit-card {{unit[2]}}_border_colour">
+    <div class="unit-container {{unit[2]}}_colour">
+        <p>Health: {{unit[3][2]}}</p>
+        <p>Mass cost: {{unit[3][3]}}</p>
+        <p>Energy cost: {{unit[3][4]}}</p>
+        <p>Build time: {{unit[3][5]}}</p>
+        <p>Tech level: {{unit[3][6]}}</p>
+        <p>Faction: {{unit[3][1]}}</p>
+    </div>
+</div>
+
+<div class="flip-card-front">
     <a href="/unit/{{unit[0]}}">
     <div class="unit-card {{unit[2]}}_border_colour">
-        <img src="../static/icons/units/{{unit[3]}}.png" style="width:100%" class="unit-card-img {{unit[2]}}_border_colour">
+        <img src="../static/icons/units/{{unit[3][0]}}.png" style="width:100%" class="unit-card-img {{unit[2]}}_border_colour">
         <div class="unit-container">
         <h4 class="{{unit[2]}}_colour">{{unit[0]}}. {{unit[1]}}</h4>
         </div>
     </div>
     </a>
+</div>
+</div>
+</div>
 {%endfor%}
 </div>
 

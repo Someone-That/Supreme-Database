@@ -309,7 +309,8 @@ def home():
 @app.route('/all')
 def all_units():
     extraction = sql_statement(f"""
-SELECT id, unit_name, tech_level, name, code, faction_name FROM
+SELECT id, unit_name, tech_level, name, code, faction_name,
+health, mass_cost, energy_cost, build_time FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -327,7 +328,14 @@ ORDER BY id""")
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
 
-        all_units.append((unit[0], result, unit[5].lower(), unit[4]))
+        # information package about the unit
+        info_nugget = [unit[4], unit[5], unit[6], unit[7], unit[8], unit[9]]
+        info_nugget.append(unit[2]) # to keep the above line length under 80
+        # code, faction_name, health, mass, energy, build time
+
+        all_units.append((unit[0], result, unit[5].lower(), info_nugget))
+        # index 0 is id, 1 is title
+        # 2 is lowercase faction name for css colouring, 3 is info nugget
 
     return render_template(
         "all_units.html", units=all_units,
@@ -348,7 +356,8 @@ def all_units_filter_pressed():
 def faction(faction):
     filter = construct_filter_statement(faction)
     faction_extract = sql_statement(f"""
-SELECT id, unit_name, tech_level, name, code, faction_name FROM
+SELECT id, unit_name, tech_level, name, code, faction_name,
+health, mass_cost, energy_cost, build_time FROM
 Units JOIN Unit_Roles ON Units.id = Unit_Roles.uid
 JOIN Roles ON Roles.role_id = Unit_Roles.rid
 JOIN Factions ON fid = faction_id
@@ -366,8 +375,15 @@ ORDER BY faction_name, tech_level""")
             # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
+        
+        # information package about the unit
+        info_nugget = [unit[4], unit[5], unit[6], unit[7], unit[8], unit[9]]
+        info_nugget.append(unit[2]) # to keep the above line length under 80
+        # code, faction_name, health, mass, energy, build time
 
-        all_units.append((unit[0], result, unit[5].lower(), unit[4]))
+        all_units.append((unit[0], result, unit[5].lower(), info_nugget))
+        # index 0 is id, 1 is title
+        # 2 is lowercase faction name for css colouring, 3 is info nugget
     return render_template(
         "faction.html", units=all_units, faction_site=faction,
         button_toggles=convert_button_toggles_to_css_class())
