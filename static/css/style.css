@@ -29,6 +29,20 @@ header
     padding: 0px 5%;
 }
 
+.home-grid3
+{
+    margin: 4% 0px;
+    display: grid;
+    grid-template-columns: 15% 20% 0% 10% 35% 20%;
+}
+
+.home-grid2
+{
+    margin: 4% 0px;
+    display: grid;
+    grid-template-columns: 15% 35% 0% 10% 20% 20%;
+}
+
 .faction-card
 {
     border: 3px solid #ffffff;
@@ -41,6 +55,12 @@ header
     margin-right: 4%;
     display: grid;
     grid-template-columns: 40% repeat(4, 1fr);
+}
+
+.home-grid-item img
+{
+    width: 95%;
+    margin: 2.5%;
 }
 
 .home-grid-item
@@ -162,7 +182,7 @@ header
     font-size: 1.2rem;
 }
 
-.faction_links li, ul li
+.faction_links li
 {
     display: inline-block;
     padding: 0px 10px;
