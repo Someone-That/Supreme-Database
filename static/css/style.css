@@ -29,7 +29,28 @@ header
     padding: 0px 5%;
 }
 
-.flip-card {
+.faction-card
+{
+    border: 3px solid #ffffff;
+    border-radius: 9px;
+}
+
+.home-grid
+{
+    margin-left: 4%;
+    margin-right: 4%;
+    display: grid;
+    grid-template-columns: 40% repeat(4, 1fr);
+}
+
+.home-grid-item
+{
+    place-content: center;
+    margin: 20px;
+}
+
+.flip-card 
+{
     background-color: transparent;
     width: 100%;
     height: 100%;
@@ -37,7 +58,8 @@ header
     display: flex;
 }
   
-.flip-card-inner {
+.flip-card-inner 
+{
     width: 100%;
     height: 100%;
     text-align: center;
@@ -47,15 +69,18 @@ header
     margin: 10px;
 }
 
-.flip-card:hover .flip-card-inner {
+.flip-card:hover .flip-card-inner 
+{
     transform: rotateY(180deg);
 }
 
-.flip-card-front, .flip-card-back {
+.flip-card-front, .flip-card-back 
+{
     backface-visibility: hidden;
 }
 
-.flip-card-back {
+.flip-card-back 
+{
     position: absolute;
     transform: rotateY(180deg);
     width: 100%;
@@ -63,9 +88,6 @@ header
 
 .unit-card 
 {
-    /* Add shadows to create the "card" effect */
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
     overflow-wrap: break-word;
     border: 1px solid #ffffff;
 }
@@ -73,12 +95,6 @@ header
 .unit-card-img
 {
     border-bottom: 1px solid;
-}
-  
-/* On mouse-over, add a deeper shadow */
-.unit-card:hover 
-{
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 
 /* Add some padding inside the card container */
@@ -89,7 +105,7 @@ header
     font-size: 0.9rem;
 }
 
-h4
+.unit-card h4
 {
     padding: 0px;
     margin-top: 0px;
@@ -278,6 +294,26 @@ h4
 .seraphim_border_colour
 {
     border-color: var(--seraphim);
+}
+
+.uef_background_colour
+{
+    background-color: rgba(0, 102, 255, 0.062);
+}
+
+.aeon_background_colour
+{
+    background-color: rgba(0, 128, 0, 0.062);
+}
+
+.cybran_background_colour
+{
+    background-color: rgba(255, 0, 0, 0.062);
+}
+
+.seraphim_background_colour
+{
+    background-color: rgba(255, 255, 0, 0.062);
 }
 
 .select2-results__option
