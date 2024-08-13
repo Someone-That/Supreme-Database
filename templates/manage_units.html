@@ -3,7 +3,7 @@
 
 <form id="manage units form" method="post" enctype="multipart/form-data">
     <label id="desire" for="submit desire">What would you like to do?</label>
-    <select id="submit desire" name="submit desire" onchange="submitAction('submitting desire')">
+    <select id="submit desire" name="submit desire" onchange="submitAction('submitting desire')" class="submit-desire">
         {% if save_data['submit desire value'] %}
         <option value="{{save_data['submit desire value']}}">{{save_data['submit desire display']}}</option>
         {% else %}
@@ -17,13 +17,13 @@
 
     <input type="hidden" id="is_submitting_desire" name="form_action" value="submit form">
 
-    <div id="form-container">
-
+    
     {% if desire == "delete" %}
-
+    <div class="form-container">
+    
     {% if nt['successful termination'] %}<label class="success-text">{{nt['successful termination']}}</label><br><br>{% endif %}
     <label>Select the unit you would like to delete:</label>
-    <select class="s2" name="delete_unit_id" style="width: 20%" onchange="submitAction('selecting unit to delete')">
+    <select class="s2" name="delete_unit_id" onchange="submitAction('selecting unit to delete')">
         {% if save_data['delete unit'] %}
         <option value="{{save_data['delete unit id']}}">{{save_data['delete unit']}}</option>
         {% else %}
@@ -39,10 +39,14 @@
 
     {% elif desire %}
 
+    <div class="form-container">
+
     {% if desire == "update" %}
+    
+    {% if nt['successful update'] %}<label class="success-text">{{nt['successful update']}}</label><br><br>{% endif %}
 
     <label>Select the unit you would like to update:</label>
-    <select class="s2" name="update_unit_id" style="width: 20%" onchange="submitAction('selecting unit to update')">
+    <select class="s2" name="update_unit_id" onchange="submitAction('selecting unit to update')">
         {% if save_data['update unit'] %}
         <option value="{{save_data['update unit id']}}">{{save_data['update unit']}}</option>
         {% else %}
@@ -59,32 +63,31 @@
 
     {% if desire == "add" or (desire == "update" and save_data['update unit']) %}
 
-    {% if nt['successful update'] %}<label class="success-text">{{nt['successful update']}}</label><br><br>{% endif %}
     {% if nt['successful add'] %}<label class="success-text">{{nt['successful add']}}</label><br><br>{% endif %}
 
     <label>Unit name:</label>
-    <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_name']}}">
     {% if nt['unit_name'] %}<label class="notification-text"> {{nt['unit_name']}}</label>{% endif %}
+    <input type="text" name="unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_name']}}">
     <br><br>
 
     <label>Unit health:</label>
-    <input type="text" name="unit_health" placeholder="1-7 characters" size="9" value="{{save_data['unit_health']}}">
     {% if nt['unit_health'] %}<label class="notification-text"> {{nt['unit_health']}}</label>{% endif %}
+    <input type="text" name="unit_health" placeholder="1-7 characters" size="9" value="{{save_data['unit_health']}}">
     <br><br>
 
     <label>Unit mass cost:</label>
-    <input type="text" name="unit_mass_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_mass_cost']}}">
     {% if nt['unit_mass_cost'] %}<label class="notification-text"> {{nt['unit_mass_cost']}}</label>{% endif %}
+    <input type="text" name="unit_mass_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_mass_cost']}}">
     <br><br>
 
     <label>Unit energy cost:</label>
-    <input type="text" name="unit_energy_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_energy_cost']}}">
     {% if nt['unit_energy_cost'] %}<label class="notification-text"> {{nt['unit_energy_cost']}}</label>{% endif %}
+    <input type="text" name="unit_energy_cost" placeholder="1-7 characters" size="9" value="{{save_data['unit_energy_cost']}}">
     <br><br>
 
     <label>Unit build time:</label>
-    <input type="text" name="unit_build_time" placeholder="1-7 characters" size="9" value="{{save_data['unit_build_time']}}">
     {% if nt['unit_build_time'] %}<label class="notification-text"> {{nt['unit_build_time']}}</label>{% endif %}
+    <input type="text" name="unit_build_time" placeholder="1-7 characters" size="9" value="{{save_data['unit_build_time']}}">
     <br><br>
 
     <label>Unit roles:</label>
@@ -133,13 +136,13 @@
     <br><br>
 
     <label>Unit code:</label>
-    <input type="text" name="unit_code" placeholder="7 characters" size="7" value="{{save_data['unit_code']}}">
     {% if nt['unit_code'] %}<label class="notification-text"> {{nt['unit_code']}}</label>{% endif %}
+    <input type="text" name="unit_code" placeholder="7 characters" size="7" value="{{save_data['unit_code']}}">
     <br><br>
 
     <label>Unit's personal name:</label>
-    <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_unit_name']}}">
     {% if nt['unit_unit_name'] %}<label class="notification-text"> {{nt['unit_unit_name']}}</label>{% endif %}
+    <input type="text" name="unit_unit_name" placeholder="2-25 characters" size="18" value="{{save_data['unit_unit_name']}}">
     <br><br>
 
     <label for="icon" class="icon_button">Unit icon (png's only)</label>
@@ -154,6 +157,7 @@
     <input type="hidden" name="override_icon_path" value="{{save_data['override_icon_path']}}">
     <img src="{{save_data['override_icon_path']}}"><br>{% endif %}
 
+    {% if nt %}<label class="notification-text">Please resolve errors.</label>{% endif %}
     <input type="submit" value="Submit">
     {% endif %}
     {% endif %}
@@ -171,6 +175,15 @@
         document.getElementById('is_submitting_desire').value = action
         document.getElementById('manage units form').submit();
     }
+
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        var scrollpos = localStorage.getItem('scrollpos');
+        if (scrollpos) window.scrollTo(0, scrollpos);
+    });
+
+    window.onbeforeunload = function(e) {
+        localStorage.setItem('scrollpos', window.scrollY);
+    };
 </script>
 
 {% endblock %}

@@ -232,12 +232,17 @@ def validate_unit(save_data):
     return nt
 
 
-def delete_unit_from_supreme_database(unit_id):
+def delete_unit_from_supreme_database(unit_id, delete_icon=True):
+    if delete_icon:
+        line_shortener = "SELECT code FROM Units WHERE id = "
+        unit_code = sql_statement(f"{line_shortener}{unit_id}")[0][0]
+        os.remove(f"{icon_folder_path}{unit_code}.png")
     sql_statement(f"DELETE FROM Units WHERE id = {unit_id};")
     sql_statement(f"DELETE FROM Unit_Roles WHERE uid = {unit_id};")
 
 
-def add_unit_to_supreme_database(sd, do_not_create_new_id=False):
+def add_unit_to_supreme_database(sd, do_not_create_new_id=False, cc=False):
+    # cc = code_changed
     # sd = save_data
     # assign unit id
     if do_not_create_new_id:
@@ -273,6 +278,12 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id=False):
 
         # insert unit into role
         sql_statement(f"INSERT INTO Unit_Roles VALUES ({unit_id}, {role_id});")
+
+    if cc:  # unit code changed
+        # this code is for updating the unit icon name to match the unit code
+        os.rename(
+            f"{icon_folder_path}{cc}.png",
+            f"{icon_folder_path}{sd['unit_code']}.png")
 
     # insert unit icon
     if "override_icon_path" in sd:
@@ -505,8 +516,13 @@ ORDER BY faction_name, tech_level""")
         elif not has_error and desire == "update":
             # no errors found with unit and desire == update
             update_unit_id = int(save_data['update_unit_id'])
-            delete_unit_from_supreme_database(update_unit_id)
-            add_unit_to_supreme_database(save_data, update_unit_id)
+            code_changed = False
+            line_shortener = "SELECT code FROM Units WHERE id = "
+            old_code = sql_statement(f"{line_shortener}{update_unit_id}")
+            if save_data["unit_code"] != old_code[0][0]:
+                code_changed = old_code[0][0]
+            delete_unit_from_supreme_database(update_unit_id, False)
+            add_unit_to_supreme_database(save_data, update_unit_id, code_changed)
             success = f"{construct_unit_title(update_unit_id)} has been "
             nt["successful update"] = f"{success}successfully updated."
             save_data = empty_save_data
