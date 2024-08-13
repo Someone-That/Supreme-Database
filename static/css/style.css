@@ -29,6 +29,34 @@ header
     padding: 0px 5%;
 }
 
+#form-container
+{
+    border-radius: 5px;
+    background-color: #242424;
+    margin-left: 25%;
+    margin-right: 25%;
+}
+
+label
+{
+    padding: 12px 12px 12px;
+    display: inline-block;
+    font-size: 1.2em;
+}
+
+input[type=text], select
+{
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+#desire
+{
+    font-size: 2em;
+}
+
 .home-grid3
 {
     margin: 4% 0px;

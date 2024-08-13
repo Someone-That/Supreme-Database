@@ -2,7 +2,7 @@
 {% block content %}
 
 <form id="manage units form" method="post" enctype="multipart/form-data">
-    <label>What would you like to do?</label>
+    <label id="desire" for="submit desire">What would you like to do?</label>
     <select id="submit desire" name="submit desire" onchange="submitAction('submitting desire')">
         {% if save_data['submit desire value'] %}
         <option value="{{save_data['submit desire value']}}">{{save_data['submit desire display']}}</option>
@@ -16,6 +16,8 @@
     <br><br>
 
     <input type="hidden" id="is_submitting_desire" name="form_action" value="submit form">
+
+    <div id="form-container">
 
     {% if desire == "delete" %}
 
@@ -155,6 +157,7 @@
     <input type="submit" value="Submit">
     {% endif %}
     {% endif %}
+    </div>
 </form>
 
 <script>
