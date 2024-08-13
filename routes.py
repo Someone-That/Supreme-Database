@@ -147,7 +147,7 @@ def validate_stat(min, max, type, stat, unit_id=-1):
             f"SELECT id FROM Units WHERE code = '{stat}'")
         for id in suspicious_ids:
             if id[0] != unit_id:  # unit code is taken
-                return "Unit's code already exists, choose another"
+                return "Unit's code already exists, choose another."
 
     if type == "personal name":
         if not stat:

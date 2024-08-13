@@ -230,6 +230,7 @@ label
 
 .notification-text
 {
+    float: right;
     color: red;
 }
 
