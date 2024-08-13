@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-		<title>Units</title>
+		<title>{% if title %}{{title}}{% else %}Units{% endif %}</title>
 		<link rel="stylesheet" href="/static/css/style.css">
-  		<link rel="icon" type="image/x-icon" href="static/icons/siteicon.png">
+  		<link rel="icon" type="image/x-icon" href="{{favicon}}">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>

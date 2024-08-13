@@ -303,7 +303,8 @@ def construct_icon_path(unit_code):
 
 @app.route('/')
 def home():
-    return render_template("home.html")
+    return render_template(
+        "home.html", favicon="static/icons/siteicon.png", title="Overview")
 
 
 @app.route('/all')
@@ -330,7 +331,7 @@ ORDER BY id""")
 
         # information package about the unit
         info_nugget = [unit[4], unit[5], unit[6], unit[7], unit[8], unit[9]]
-        info_nugget.append(unit[2]) # to keep the above line length under 80
+        info_nugget.append(unit[2])  # to keep the above line length under 80
         # code, faction_name, health, mass, energy, build time
 
         all_units.append((unit[0], result, unit[5].lower(), info_nugget))
@@ -339,7 +340,8 @@ ORDER BY id""")
 
     return render_template(
         "all_units.html", units=all_units,
-        button_toggles=convert_button_toggles_to_css_class())
+        button_toggles=convert_button_toggles_to_css_class(),
+        favicon="static/icons/siteicon.png", title="All Units")
 
 
 @app.route('/all', methods=['POST'])  # user pressed filter button on homepage
@@ -375,10 +377,10 @@ ORDER BY faction_name, tech_level""")
             # example output: T1 Engineer [UAL0105]
         if unit[1]:  # unit has a name
             result = f"{unit[1]}: {result}"
-        
+
         # information package about the unit
         info_nugget = [unit[4], unit[5], unit[6], unit[7], unit[8], unit[9]]
-        info_nugget.append(unit[2]) # to keep the above line length under 80
+        info_nugget.append(unit[2])  # to keep the above line length under 80
         # code, faction_name, health, mass, energy, build time
 
         all_units.append((unit[0], result, unit[5].lower(), info_nugget))
@@ -386,7 +388,8 @@ ORDER BY faction_name, tech_level""")
         # 2 is lowercase faction name for css colouring, 3 is info nugget
     return render_template(
         "faction.html", units=all_units, faction_site=faction,
-        button_toggles=convert_button_toggles_to_css_class())
+        button_toggles=convert_button_toggles_to_css_class(),
+        favicon=f"../static/icons/{faction}icon.png", title=faction)
 
 
 @app.route('/faction/<string:faction>', methods=['POST'])
@@ -402,7 +405,9 @@ def filter_pressed(faction):
 
 @app.route('/manage-units')
 def manage_units():
-    return render_template("manage_units.html", save_data={}, nt={})
+    return render_template(
+        "manage_units.html", save_data={}, nt={},
+        favicon="static/icons/siteicon.png", title="Manage Units")
 
 
 @app.route('/manage-units', methods=['POST'])
@@ -564,11 +569,13 @@ GROUP BY id""")
         save_data = empty_save_data
         return render_template(
             "manage_units.html", desire=desire, units=all_units,
-            save_data=save_data, nt=nt)
+            save_data=save_data, nt=nt,
+            favicon="static/icons/siteicon.png", title="Manage Units")
 
     return render_template(
         "manage_units.html", desire=desire, units=all_units,
-        save_data=save_data, nt=nt)
+        save_data=save_data, nt=nt,
+        favicon="static/icons/siteicon.png", title="Manage Units")
 
 
 @app.errorhandler(404)  # 404 page
