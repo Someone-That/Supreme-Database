@@ -522,7 +522,8 @@ ORDER BY faction_name, tech_level""")
             if save_data["unit_code"] != old_code[0][0]:
                 code_changed = old_code[0][0]
             delete_unit_from_supreme_database(update_unit_id, False)
-            add_unit_to_supreme_database(save_data, update_unit_id, code_changed)
+            add_unit_to_supreme_database(
+                save_data, update_unit_id, code_changed)
             success = f"{construct_unit_title(update_unit_id)} has been "
             nt["successful update"] = f"{success}successfully updated."
             save_data = empty_save_data
@@ -596,7 +597,7 @@ GROUP BY id""")
 
 @app.errorhandler(404)  # 404 page
 def page_not_found(error):
-    return render_template("404.html", title="cease this")
+    return render_template("404.html", title="Page doesn't exist")
 
 
 if __name__ == "__main__":
