@@ -13,11 +13,16 @@ faction_filter = []
 role_filter = []
 all_roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 all_tech_levels = [(1, 1), (2, 2), (3, 3), (4, "Experimental")]
-all_factions = [(4, "UEF"), (3, "Aeon"), (2, "Cybran"), (1, "Seraphim")]
+all_factions = []
+with sqlite3.connect(DATABASE_FILE) as connection:
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Factions;")
+    all_factions = cursor.fetchall()
+    all_factions.reverse()
 
 
 button_order = [
-    '1', '2', '3', '4', "UEF", "Aeon", "Cybran", "Seraphim",
+    '1', '2', '3', '4', all_factions[0][1], all_factions[1][1], all_factions[2][1], all_factions[3][1],
     "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 button_toggles = [
     False, False, False, False, False, False,
