@@ -14,19 +14,36 @@ role_filter = []
 all_roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 all_tech_levels = [(1, 1), (2, 2), (3, 3), (4, "Experimental")]
 all_factions = []
+button_order = []
 with sqlite3.connect(DATABASE_FILE) as connection:
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM Factions;")
     all_factions = cursor.fetchall()
     all_factions.reverse()
 
+    cursor.execute("SELECT * FROM Orders;")
+    orders = cursor.fetchall()
+
+    all_tech_levels = []
+    all_roles = []
+    for order in orders:
+        if order[0]:
+            if order[1]:
+                all_tech_levels.append((order[0], order[1]))
+            else:
+                all_tech_levels.append((order[0], order[0]))
+        if order[2]:
+            all_roles.append(order[2])
+        
+    print(orders)
+
 
 button_order = [
     '1', '2', '3', '4', all_factions[0][1], all_factions[1][1], all_factions[2][1], all_factions[3][1],
     "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
-button_toggles = [
-    False, False, False, False, False, False,
-    False, False, False, False, False, False, False]
+button_toggles = []
+for i in range(len(button_order)):
+    button_toggles.append(False)
 
 
 def sql_statement(sql):
@@ -270,8 +287,7 @@ def add_unit_to_supreme_database(sd, do_not_create_new_id=False, cc=False):
 
     # insert unit roles
     unit_roles = []
-    roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
-    for role in roles:
+    for role in all_roles:
         if role in sd:
             unit_roles.append(role)
 
