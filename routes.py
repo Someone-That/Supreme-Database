@@ -11,8 +11,8 @@ temp_folder_path = "static/temp/"
 tech_filter = []
 faction_filter = []
 role_filter = []
-all_roles = ["Land", "Air", "Naval", "Anti Air", "Anti Naval"]
-all_tech_levels = [(1, 1), (2, 2), (3, 3), (4, "Experimental")]
+all_roles = []
+all_tech_levels = []
 all_factions = []
 button_order = []
 with sqlite3.connect(DATABASE_FILE) as connection:
@@ -24,23 +24,21 @@ with sqlite3.connect(DATABASE_FILE) as connection:
     cursor.execute("SELECT * FROM Orders;")
     orders = cursor.fetchall()
 
-    all_tech_levels = []
-    all_roles = []
     for order in orders:
         if order[0]:
+            button_order.append(str(order[0]))
             if order[1]:
                 all_tech_levels.append((order[0], order[1]))
             else:
                 all_tech_levels.append((order[0], order[0]))
         if order[2]:
             all_roles.append(order[2])
-        
-    print(orders)
+    for f in all_factions:
+        button_order.append(f[1])
+    for r in all_roles:
+        button_order.append(r)
 
 
-button_order = [
-    '1', '2', '3', '4', all_factions[0][1], all_factions[1][1], all_factions[2][1], all_factions[3][1],
-    "Land", "Air", "Naval", "Anti Air", "Anti Naval"]
 button_toggles = []
 for i in range(len(button_order)):
     button_toggles.append(False)
@@ -388,6 +386,11 @@ def all_units_filter_pressed():
 
 @app.route('/faction/<string:faction>')
 def faction(faction):
+    check_factions = []
+    for f in all_factions:
+        check_factions.append(f[1])
+    if faction not in check_factions:
+        return render_template("404.html", title="Page doesn't exist")
     filter = construct_filter_statement(faction)
     faction_extract = sql_statement(f"""
 SELECT id, unit_name, tech_level, name, code, faction_name,
